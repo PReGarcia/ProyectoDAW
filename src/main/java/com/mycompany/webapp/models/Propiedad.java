@@ -14,13 +14,13 @@ public class Propiedad {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long propiedad_id;
     @Column(nullable = false)
+    private String nombre;
+    @Column(nullable = false)
     private String calle_numero;
     @Column(nullable = false)
     private String ciudad;
     @Column(nullable = false)
     private String codigo_postal;
-    @Column(nullable = false)
-    private String pais;
     @Column(nullable = false)
     private double precio_habitacion;
     @Column(nullable = false)
@@ -31,12 +31,54 @@ public class Propiedad {
     private double latitud;
     @Column(nullable = false)
     private double longitud;
+    private String descripcion;
     @ManyToOne
     @JoinColumn(name = "id_propietario", nullable = false)
     private Usuario propietario;
 
     public Propiedad() {
     }
+
+    public Propiedad(String nombre, String calle_numero, String ciudad, String codigo_postal,
+            double precio_habitacion, int habitaciones, int baños, double latitud, double longitud,
+            String descripcion, Usuario propietario) {
+        this.nombre = nombre;
+        this.calle_numero = calle_numero;
+        this.ciudad = ciudad;
+        this.codigo_postal = codigo_postal;
+        this.precio_habitacion = precio_habitacion;
+        this.habitaciones = habitaciones;
+        this.baños = baños;
+        this.latitud = latitud;
+        this.longitud = longitud;
+        this.descripcion = descripcion;
+        this.propietario = propietario;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Usuario getPropietario() {
+        return propietario;
+    }
+
+    public void setPropietario(Usuario propietario) {
+        this.propietario = propietario;
+    }
+
 
     public double getPrecio_habitacion() {
         return precio_habitacion;
@@ -98,11 +140,5 @@ public class Propiedad {
     }
     public void setCodigo_postal(String codigo_postal) {
         this.codigo_postal = codigo_postal;
-    }
-    public String getPais() {
-        return pais;
-    }
-    public void setPais(String pais) {
-        this.pais = pais;
     }
 }
