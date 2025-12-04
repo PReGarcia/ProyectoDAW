@@ -1,4 +1,5 @@
 com\mycompany\webapp\models\Usuario.class
 com\mycompany\webapp\models\Reserva.class
 com\mycompany\webapp\models\Propiedad.class
+com\mycompany\webapp\controllers\PropiedadController.class
 com\mycompany\webapp\controllers\UsuarioController.class
