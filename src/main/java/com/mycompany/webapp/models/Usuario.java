@@ -48,7 +48,6 @@ public class Usuario {
         this.apellidos = apellidos;
         this.email = email;
         this.contra = contra;
-        this.rol = "USER";
     }
 
     public long getUsuario_id() {
