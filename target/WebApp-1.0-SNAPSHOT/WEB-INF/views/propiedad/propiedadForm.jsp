@@ -38,6 +38,14 @@
             <label for="banos">Número de Baños:</label>
             <input type="number" name="banos" required>
             <br>
+            
+            <label for="latitud">Latitud:</label>
+            <input type="number" name="latitud" required>
+            <br>
+            
+            <label for="longitud">Longitud:</label>
+            <input type="number" name="longitud" required>
+            <br>
 
             <input type="submit" value="Guardar Propiedad" class="button">
         </form>

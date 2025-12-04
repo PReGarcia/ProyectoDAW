@@ -94,7 +94,7 @@ public class UsuarioController extends HttpServlet {
             if (u != null) {
                 session.setAttribute("user", u);
                 session.setAttribute("role", u.getRol());
-                newRequest = "/WebApp";
+                newRequest = "/index.html";
             } else {
                 msg = "ERROR: Login incorrecto";
                 style = "danger";
