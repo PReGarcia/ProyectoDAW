@@ -91,7 +91,7 @@ public class UsuarioController extends HttpServlet {
             if (u != null) {
                 session.setAttribute("user", u);
                 session.setAttribute("rol", u.getRol());
-                newRequest = "/index.html";
+                response.sendRedirect(request.getContextPath() + "/propiedades");
             } else {
                 msg = "ERROR: Login incorrecto";
                 style = "danger";
@@ -100,9 +100,10 @@ public class UsuarioController extends HttpServlet {
                 newRequest = "/WebApp/usuario/entrar";
                 request.setAttribute("msg", msg);
                 request.setAttribute("style", style);
+                RequestDispatcher rd = request.getRequestDispatcher(newRequest);
+                rd.forward(request, response);
             }
-            RequestDispatcher rd = request.getRequestDispatcher(newRequest);
-            rd.forward(request, response);
+            
         } else {
             RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/error.jsp");
             rd.forward(request, response);

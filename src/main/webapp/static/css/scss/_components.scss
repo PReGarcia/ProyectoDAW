@@ -52,31 +52,6 @@
     }
 }
 
-/* --- TABLAS --- */
-// Usado en: usuarios.jsp
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: $white;
-    margin-top: $spacing-md;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-
-    th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid $border-color;
-    }
-
-    th {
-        background-color: $secondary-color;
-        color: $white;
-    }
-
-    tr:hover {
-        background-color: lighten($light-bg, 2%);
-    }
-}
-
 /* --- TARJETAS DE PROPIEDADES --- */
 // Usado en: propiedades.jsp
 .propiedades-grid {
@@ -95,6 +70,7 @@ table {
     transition: transform 0.3s;
     display: flex;
     flex-direction: column;
+    margin: 1rem;
 
     &:hover {
         transform: translateY(-5px);
