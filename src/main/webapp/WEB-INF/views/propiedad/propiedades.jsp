@@ -6,8 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Propiedades</title>
-    <%-- Asumo que usas el mismo CSS principal --%>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/main.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/WEB-INF/static/css/main.css">
 </head>
 <body>
     
@@ -22,7 +21,7 @@
         <%-- Contenedor principal de la rejilla de tarjetas --%>
         <div class="propiedades-grid">
             
-            <%-- Verificamos si la lista no está vacía --%>
+            <%-- Verificamos si la lista no estÃ¡ vacÃ­a --%>
             <c:if test="${!empty requestScope.propiedades}">
                 
                 <%-- Iteramos sobre la lista enviada por el controlador --%>
@@ -32,7 +31,7 @@
                         
                         <%-- Contenedor de la imagen --%>
                         <div class="propiedad-img-container">
-                            <%-- Placeholder para la imagen (marcador de posición) --%>
+                            <%-- Placeholder para la imagen (marcador de posiciÃ³n) --%>
                             <img src="${pageContext.request.contextPath}/static/img/placeholder_house.jpg" 
                                  alt="Imagen de ${p.nombre}" 
                                  class="propiedad-img">
@@ -47,9 +46,9 @@
                             </p>
                             
                             <div class="propiedad-footer">
-                                <span class="propiedad-precio">${p.precio_habitacion} € / noche</span>
+                                <span class="propiedad-precio">${p.precio_habitacion} â¬ / noche</span>
                                 <%-- Enlace opcional para ver detalles si lo implementas luego --%>
-                                <a href="${pageContext.request.contextPath}/propiedad/detalle?id=${p.propiedad_id}" class="btn-detalle">Ver más</a>
+                                <a href="${pageContext.request.contextPath}/propiedad/detalle?id=${p.propiedad_id}" class="btn-detalle">Ver mÃ¡s</a>
                             </div>
                         </div>
                         

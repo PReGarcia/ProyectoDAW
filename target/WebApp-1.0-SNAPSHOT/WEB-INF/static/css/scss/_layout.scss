@@ -1,0 +1,35 @@
+// Barra de Navegación
+nav {
+    background-color: $secondary-color;
+    padding: $spacing-md;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: $white;
+
+    a {
+        color: $white;
+        margin: 0 $spacing-sm;
+        font-weight: 500;
+
+        &:hover {
+            color: $primary-color;
+        }
+    }
+}
+
+// Contenedor Central
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-lg;
+    
+    // Centrado para formularios de login/registro
+    &.center-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+    }
+}

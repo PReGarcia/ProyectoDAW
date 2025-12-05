@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario Usuario</title>
-    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/WEB-INF/static/css/main.css">
 </head>
 <body>
     <div>
         <h1>Registrar Nuevo Usuario</h1>
-        <form action="/WebApp/usuario/guardar" method="POST" class="form">
+        <form action="${pageContext.request.contextPath}/usuario/guardar" method="POST" class="form">
             
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" name="nombre" required placeholder="Nombre">

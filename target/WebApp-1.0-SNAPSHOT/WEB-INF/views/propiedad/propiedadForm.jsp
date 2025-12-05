@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Formulario Propiedad</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/main.css">
-</head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Formulario Usuario</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/WEB-INF/static/css/main.css">
+    </head>
 <body>
     <div>
         <h1>Registrar Propiedad</h1>

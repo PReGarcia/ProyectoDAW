@@ -1,0 +1,189 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f6;
+  color: #333333;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+a {
+  text-decoration: none;
+  color: #3498db;
+  transition: color 0.3s;
+}
+a:hover {
+  color: #2980b9;
+}
+
+nav {
+  background-color: #2c3e50;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+}
+nav a {
+  color: #ffffff;
+  margin: 0 8px;
+  font-weight: 500;
+}
+nav a:hover {
+  color: #3498db;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.container.center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+/* --- BOTONES --- */
+.button, .btn-detalle {
+  display: inline-block;
+  background-color: #3498db;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-align: center;
+  transition: background 0.3s;
+}
+.button:hover, .btn-detalle:hover {
+  background-color: #2980b9;
+  color: #ffffff;
+}
+
+/* --- FORMULARIOS --- */
+.form {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+.form input[type=text],
+.form input[type=email],
+.form input[type=password],
+.form input[type=number] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.form input[type=text]:focus,
+.form input[type=email]:focus,
+.form input[type=password]:focus,
+.form input[type=number]:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* --- TABLAS --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  margin-top: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+table th, table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+table th {
+  background-color: #2c3e50;
+  color: #ffffff;
+}
+table tr:hover {
+  background-color: rgb(249.9052631579, 251.2947368421, 250.8315789474);
+}
+
+/* --- TARJETAS DE PROPIEDADES --- */
+.propiedades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.propiedad-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+.propiedad-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+.propiedad-card .propiedad-img-container {
+  width: 100%;
+  height: 200px;
+  background-color: #ddd;
+}
+.propiedad-card .propiedad-img-container .propiedad-img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.propiedad-card .propiedad-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.propiedad-card .propiedad-info .propiedad-titulo {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+.propiedad-card .propiedad-info .propiedad-ubicacion {
+  color: rgb(127.5, 127.5, 127.5);
+  margin-bottom: 16px;
+}
+.propiedad-card .propiedad-info .propiedad-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f4f7f6;
+  padding-top: 8px;
+}
+.propiedad-card .propiedad-info .propiedad-footer .propiedad-precio {
+  font-weight: bold;
+  color: #3498db;
+  font-size: 1.1rem;
+}/*# sourceMappingURL=main.css.map */

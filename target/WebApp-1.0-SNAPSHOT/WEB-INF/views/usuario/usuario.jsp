@@ -5,6 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Wen App</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/WEB-INF/static/css/main.css">
     </head>
 
     <body>

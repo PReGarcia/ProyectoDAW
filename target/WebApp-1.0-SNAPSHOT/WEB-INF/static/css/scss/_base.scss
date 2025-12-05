@@ -1,0 +1,27 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: $font-stack;
+    background-color: $light-bg;
+    color: $text-color;
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    color: $secondary-color;
+    margin-bottom: $spacing-md;
+}
+
+a {
+    text-decoration: none;
+    color: $primary-color;
+    transition: color 0.3s;
+
+    &:hover {
+        color: $primary-dark;
+    }
+}
