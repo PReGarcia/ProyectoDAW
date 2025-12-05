@@ -51,6 +51,11 @@ public class UsuarioController extends HttpServlet {
                 vista = "usuarioLogin";
                 break;
             }
+            case "/salir": {
+                logout(request);
+                response.sendRedirect(request.getContextPath() + "/propiedades");
+                return;
+            }
             default: {
                 vista = "error";
             }
@@ -165,5 +170,10 @@ public class UsuarioController extends HttpServlet {
         }
 
         return user;
+    }
+
+    public void logout(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.invalidate();
     }
 }

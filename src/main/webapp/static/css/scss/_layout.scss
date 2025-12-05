@@ -3,15 +3,14 @@ nav {
     padding: $spacing-md;
     color: $white;
     
-    // Configuración Flex para el contenedor principal
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; // Permite que los elementos caigan a la siguiente línea en móvil
+    flex-wrap: wrap; 
 
-    // 1. ESTILO DEL BOTÓN HAMBURGUESA
+    // 1. ESTILO DEL BOTÓN 
     .nav-toggle {
-        display: none; // ESCRITORIO: Oculto por defecto
+        display: none; 
         background: transparent;
         border: none;
         color: $white;
@@ -21,12 +20,11 @@ nav {
 
     // 2. ESTILO DEL MENÚ
     .nav-menu {
-        display: flex; // ESCRITORIO: Visible y en fila
+        display: flex; 
         justify-content: space-between;
         width: 100%;
         align-items: center;
 
-        // Quitamos margen al contenedor interno para que cuadre
         .nav-left, .nav-right {
             display: flex;
             align-items: center;
@@ -47,24 +45,20 @@ nav {
     // --- MÓVIL (PANTALLAS MENORES A 768PX) ---
     @media (max-width: 768px) {
         
-        // El botón aparece
         .nav-toggle {
             display: block; 
         }
 
-        // El menú se oculta y cambia a columna
         .nav-menu {
-            display: none; // MÓVIL: Oculto por defecto
+            display: none; 
             flex-direction: column;
             width: 100%;
             margin-top: 15px;
             
-            // Cuando JS añade la clase .active, se muestra
             &.active {
                 display: flex; 
             }
 
-            // Ajustamos los hijos para que se apilen
             .nav-left, .nav-right {
                 flex-direction: column;
                 width: 100%;

@@ -11,12 +11,10 @@
 
     <body>
         <nav class="navbar">
-            <%-- 1. BOTÓN HAMBURGUESA (Solo visible en móvil) --%>
                 <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">
-                    &#9776; <%-- Símbolo de tres líneas --%>
+                    &#9776; 
                 </button>
 
-                <%-- 2. CONTENEDOR DE ENLACES (Lo que se ocultará/mostrará) --%>
                     <div class="nav-menu" id="navMenu">
 
                         <div class="nav-left">
@@ -88,4 +86,10 @@
         </div>
     </body>
 
+    
+    <script src="${pageContext.request.contextPath}/static/js/menu.js"></script>
+
+    <footer id="footer">
+        <p>&copy; 2024 Mi Aplicación de Propiedades. Todos los derechos reservados.</p> 
+    </footer>
     </html>
