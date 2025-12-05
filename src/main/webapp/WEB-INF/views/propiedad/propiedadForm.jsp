@@ -9,7 +9,7 @@
 <body>
     <div>
         <h1>Registrar Propiedad</h1>
-        <form action="${pageContext.request.contextPath}/propiedad/save" method="POST" class="form">
+        <form action="${pageContext.request.contextPath}/propiedad/guardar" method="POST" class="form">
             
             <label for="calle_numero">Calle y Número:</label>
             <input type="text" name="calle_numero" required>
@@ -23,8 +23,8 @@
             <input type="text" name="codigo_postal" required>
             <br>
 
-            <label for="pais">País:</label>
-            <input type="text" name="pais" required>
+            <label for="nombre">Nombre:</label>
+            <input type="text" name="nombre" required>
             <br>
 
             <label for="precio_habitacion">Precio por Habitación:</label>
@@ -40,11 +40,11 @@
             <br>
             
             <label for="latitud">Latitud:</label>
-            <input type="number" name="latitud" required>
+            <input type="number" step="any" name="latitud" required>
             <br>
             
             <label for="longitud">Longitud:</label>
-            <input type="number" name="longitud" required>
+            <input type="number" step="any" name="longitud" required>
             <br>
 
             <input type="submit" value="Guardar Propiedad" class="button">

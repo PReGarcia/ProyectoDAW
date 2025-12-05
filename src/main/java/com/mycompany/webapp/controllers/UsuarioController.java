@@ -69,9 +69,6 @@ public class UsuarioController extends HttpServlet {
             String email = request.getParameter("email");
             String contra = request.getParameter("contra");
             try {
-                if (name.isEmpty() || email.isEmpty() || contra.isEmpty() || apellido.isEmpty()) {
-                    throw new NullPointerException();
-                }
                 Usuario u = new Usuario(name, apellido, email, contra);
                 nuevoUsuario(u);
                 response.sendRedirect("http://localhost:8080/WebApp/");
@@ -93,7 +90,7 @@ public class UsuarioController extends HttpServlet {
             String newRequest;
             if (u != null) {
                 session.setAttribute("user", u);
-                session.setAttribute("role", u.getRol());
+                session.setAttribute("rol", u.getRol());
                 newRequest = "/index.html";
             } else {
                 msg = "ERROR: Login incorrecto";
@@ -139,7 +136,6 @@ public class UsuarioController extends HttpServlet {
     }
 
     public void nuevoUsuario(Usuario u) {
-        Long id = u.getUsuario_id();
         try {
             utx.begin();
             em.persist(u);

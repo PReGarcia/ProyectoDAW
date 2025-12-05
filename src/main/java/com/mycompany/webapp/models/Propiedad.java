@@ -1,5 +1,6 @@
 package com.mycompany.webapp.models;
 
+import jakarta.inject.Named;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,8 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Propiedad.findAll", query = "SELECT p FROM Propiedad p"),
+})
 public class Propiedad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
