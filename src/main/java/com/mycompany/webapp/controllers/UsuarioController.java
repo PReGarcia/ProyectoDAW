@@ -33,7 +33,7 @@ public class UsuarioController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String vista;
+        String vista = "/WEB-INF/views/usuario/";
         String accion = null;
         if (request.getServletPath().equals("/usuario")) {
             if (request.getPathInfo() != null) {
@@ -44,11 +44,11 @@ public class UsuarioController extends HttpServlet {
         }
         switch (accion) {
             case "/nuevo": {
-                vista = "usuarioForm";
+                vista += "usuarioForm.jsp";
                 break;
             }
             case "/entrar": {
-                vista = "usuarioLogin";
+                vista += "usuarioLogin.jsp";
                 break;
             }
             case "/salir": {
@@ -57,10 +57,11 @@ public class UsuarioController extends HttpServlet {
                 return;
             }
             default: {
-                vista = "error";
+                vista += "error.jsp";
             }
         }
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/usuario/" + vista + ".jsp");
+        request.setAttribute("view", vista);
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
         rd.forward(request, response);
     }
 
@@ -79,7 +80,8 @@ public class UsuarioController extends HttpServlet {
                 response.sendRedirect("http://localhost:8080/WebApp/");
             } catch (Exception e) {
                 request.setAttribute("msg", "Error: datos no válidos");
-                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/error.jsp");
+                request.setAttribute("view", "/WEB-INF/views/error.jsp");
+                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
                 rd.forward(request, response);
             }
         } else if (accion.equals("/validar")) {

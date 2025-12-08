@@ -33,36 +33,49 @@ public class PropiedadController extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException{
-        String vista = null;
+        String vista = "/WEB-INF/views/propiedad/";
         String accion = "/propiedades";
         if (request.getServletPath().equals("/propiedad")) {
             if (request.getPathInfo() != null) {
                 accion = request.getPathInfo();
             } else {
-                accion = "error";
+                accion = "/error";
             }
         }
         switch (accion) {
             case "/propiedades":
                 request.setAttribute("propiedades", findAll());
-                vista = "propiedades";
+                vista += "propiedades.jsp";
                 break;
 
             case "/nuevo":
                 if(request.getSession().getAttribute("user") != null){
-                    vista = "propiedadForm";
+                    vista += "propiedadForm.jsp";
                 }
                 else{
                     response.sendRedirect("/WebApp/usuario/entrar");
                     return;
                 }
                 break;
+            
+            case "/detalle": 
+                long id = Long.parseLong(request.getParameter("id"));
+
+                Propiedad p = em.find(Propiedad.class, id);
+                if (p != null) {
+                    request.setAttribute("p", p);
+                    vista += "detalle.jsp";
+                } else {
+                    request.setAttribute("msg", "La propiedad no existe");
+                    vista += "error.jsp";
+                }
 
             default:
-                vista = "error";
+                vista += "error.jsp";
                 break;
         }
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/propiedad/" + vista + ".jsp");
+        request.setAttribute("view", vista);
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
         rd.forward(request, response);
     }
 
@@ -92,7 +105,8 @@ public class PropiedadController extends HttpServlet {
                 response.sendRedirect("http://localhost:8080/WebApp/");
             } catch (Exception e) {
                 request.setAttribute("msg", "Error: datos no válidos");
-                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/error.jsp");
+                request.setAttribute("view", "/WEB-INF/views/error.jsp");
+                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
                 rd.forward(request, response);
             }
         }
