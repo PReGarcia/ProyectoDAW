@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <div>
         <h1>Registrar Propiedad</h1>
-        <form action="${pageContext.request.contextPath}/propiedad/guardar" method="POST" class="form">
+        <form action="${pageContext.request.contextPath}/propiedad/guardar" method="POST" class="form" enctype="multipart/form-data">
             <label for="nombre">Nombre:</label>
             <input type="text" name="nombre" required>
             <br>

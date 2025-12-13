@@ -2,7 +2,10 @@ package com.mycompany.webapp.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,10 +30,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import jakarta.transaction.UserTransaction;
 
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
-    maxFileSize = 1024 * 1024 * 10,      // 10 MB
-    maxRequestSize = 1024 * 1024 * 50    // 50 MB
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+        maxFileSize = 1024 * 1024 * 10, // 10 MB
+        maxRequestSize = 1024 * 1024 * 50 // 50 MB
 )
 @WebServlet(name = "PropiedadController", urlPatterns = { "/propiedades", "/propiedad/*" })
 public class PropiedadController extends HttpServlet {
@@ -43,8 +45,8 @@ public class PropiedadController extends HttpServlet {
     private static final Logger Log = Logger.getLogger(UsuarioController.class.getName());
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) 
-    throws ServletException, IOException{
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String vista = "/WEB-INF/views/propiedad/";
         String accion = "/propiedades";
         if (request.getServletPath().equals("/propiedad")) {
@@ -61,16 +63,15 @@ public class PropiedadController extends HttpServlet {
                 break;
 
             case "/nuevo":
-                if(request.getSession().getAttribute("user") != null){
+                if (request.getSession().getAttribute("user") != null) {
                     vista += "propiedadForm.jsp";
-                }
-                else{
+                } else {
                     response.sendRedirect("/WebApp/usuario/entrar");
                     return;
                 }
                 break;
-            
-            case "/detalle": 
+
+            case "/detalle":
                 long id = Long.parseLong(request.getParameter("id"));
 
                 Propiedad p = em.find(Propiedad.class, id);
@@ -92,10 +93,9 @@ public class PropiedadController extends HttpServlet {
         rd.forward(request, response);
     }
 
-
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) 
-    throws ServletException, IOException{
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String accion = request.getPathInfo();
         if (accion.equals("/guardar")) {
             String nombre = request.getParameter("nombre");
@@ -107,15 +107,16 @@ public class PropiedadController extends HttpServlet {
             int baños = Integer.parseInt(request.getParameter("banos"));
             double latitud = Double.parseDouble(request.getParameter("latitud"));
             double longitud = Double.parseDouble(request.getParameter("longitud"));
-            String descripcion = request.getParameter("descripcion");   
+            String descripcion = request.getParameter("descripcion");
             Usuario propietario = (Usuario) request.getSession().getAttribute("user");
 
             Propiedad p = new Propiedad(nombre, calle_numero, ciudad, codigo_postal,
                     precio_habitacion, habitaciones, baños, latitud, longitud,
                     descripcion, propietario);
-            try{
+            try {
+                FotoController fc = new FotoController();
                 nuevaPropiedad(p);
-                guardarFotos(p, request.getParts());
+                fc.guardarFotos(p, request.getParts());
                 response.sendRedirect("http://localhost:8080/WebApp/");
             } catch (Exception e) {
                 request.setAttribute("msg", "Error: datos no válidos");
@@ -127,7 +128,7 @@ public class PropiedadController extends HttpServlet {
 
     }
 
-    public List<Propiedad> findAll(){
+    public List<Propiedad> findAll() {
         TypedQuery<Propiedad> q1 = em.createNamedQuery("Propiedad.findAll", Propiedad.class);
         return q1.getResultList();
     }
@@ -148,36 +149,11 @@ public class PropiedadController extends HttpServlet {
         }
     }
 
-    public void guardarFotos(Propiedad p, Collection<Part> fotosForm){
-        String uploadPath = getServletContext().getRealPath("") + File.separator + "static" +File.separator + "img" + File.separator + "propiedades" + File.separator + p.getPropiedad_id();
-        File uploadDir = new File(uploadPath);
-        if(!uploadDir.exists()) uploadDir.mkdir();
+    public Propiedad getById(Long id){
+        TypedQuery<Propiedad> query = em.createNamedQuery("Propiedad.getById", Propiedad.class);
+        query.setParameter("propiedad_id", id);
 
-        List<Foto> listaFotos = new ArrayList<>();  
-
-        try{
-            for(Part part: fotosForm){
-                if(part.getName().equals("imagenes") && part.getSize() > 0){
-                    String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-                    part.write(uploadPath + File.separator + fileName);
-
-                    String rutaRelativa = "static/img/propiedades" + p.getPropiedad_id() + File.separator + fileName;
-                    Foto foto = new Foto(rutaRelativa, p);
-                    listaFotos.add(foto);
-                }
-            }
-
-            if(!listaFotos.isEmpty()){
-                utx.begin();
-                for(Foto f: listaFotos){
-                    em.persist(f);
-                }
-                utx.commit();
-            }
-        }catch(Exception e){
-            Log.severe("Error: " + e.getMessage());
-        }
-
+        return query.getSingleResult();
     }
-        
+
 }
