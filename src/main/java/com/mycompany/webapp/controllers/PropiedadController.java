@@ -170,7 +170,7 @@ public class PropiedadController extends HttpServlet {
             if(!listaFotos.isEmpty()){
                 utx.begin();
                 for(Foto f: listaFotos){
-                    em.persist(listaFotos);
+                    em.persist(f);
                 }
                 utx.commit();
             }
