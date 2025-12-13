@@ -28,15 +28,55 @@
                 <h3>Descripción</h3>
                 <p>${p.descripcion}</p>
             </div>
-            
-            <div style="margin-bottom: 20px;">
-                 <a href="https://www.google.com/maps/search/?api=1&query=${p.latitud},${p.longitud}" 
-                    target="_blank" 
-                    style="color: #3498db; text-decoration: underline;">
-                    Ver en el mapa
-                 </a>
-            </div>
 
+<div style="margin-bottom: 20px;">
+                <h3>Ubicación</h3>
+                
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                 integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+                 crossorigin=""/>
+                 
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                 integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+                 crossorigin=""></script>
+
+                <div id="map" style="height: 350px; width: 100%; border-radius: 5px; border: 1px solid #ddd; z-index: 1;"></div>
+
+                <script>
+                    // Esperamos a que el DOM esté cargado
+                    document.addEventListener("DOMContentLoaded", function() {
+                        
+                        // Obtenemos las coordenadas desde el JSP
+
+                        var lat = parseFloat("${p.latitud}".replace(',', '.'));
+                        var lng = parseFloat("${p.longitud}".replace(',', '.'));
+
+                        // Verificamos que las coordenadas no sean 0.0 (valor por defecto de double)
+                        if (lat !== 0.0 && lng !== 0.0) {
+                            
+                            // Inicializar el mapa centrado en las coordenadas
+                            var map = L.map('map').setView([lat, lng], 15);
+
+                            // Añadir la capa de tiles de OpenStreetMap
+                            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                maxZoom: 19,
+                                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                            }).addTo(map);
+
+                            // Añadir el marcador (pin)
+                            var marker = L.marker([lat, lng]).addTo(map);
+                            
+                            // Añadir un popup con el nombre de la propiedad
+                            marker.bindPopup("<b>${p.nombre}</b><br>${p.calle_numero}").openPopup();
+                            
+                        } else {
+                            // Si no hay coordenadas válidas, mostramos un mensaje o una ubicación por defecto
+                            document.getElementById('map').innerHTML = '<p style="text-align:center; padding-top: 150px; color: #7f8c8d;">Ubicación no disponible en el mapa.</p>';
+                        }
+                    });
+                </script>
+            </div>
+            
             <div class="propiedad-footer" style="border-top: 1px solid #eee; padding-top: 20px; display: flex; justify-content: space-between;">
                 <div>
                     <small>Publicado por: <strong>${p.propietario.nombre} ${p.propietario.apellidos}</strong></small>

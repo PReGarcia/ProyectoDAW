@@ -1,6 +1,8 @@
 package com.mycompany.webapp.models;
 
-import jakarta.inject.Named;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,10 +12,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Propiedad.findAll", query = "SELECT p FROM Propiedad p"),
+        @NamedQuery(name = "Propiedad.findAll", query = "SELECT p FROM Propiedad p"),
 })
 public class Propiedad {
     @Id
@@ -32,7 +35,7 @@ public class Propiedad {
     @Column(nullable = false)
     private int habitaciones;
     @Column(nullable = false)
-    private int baños; 
+    private int baños;
     @Column(nullable = false)
     private double latitud;
     @Column(nullable = false)
@@ -41,6 +44,8 @@ public class Propiedad {
     @ManyToOne
     @JoinColumn(name = "id_propietario", nullable = false)
     private Usuario propietario;
+    @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Foto> fotos;
 
     public Propiedad() {
     }
@@ -85,7 +90,6 @@ public class Propiedad {
         this.propietario = propietario;
     }
 
-
     public double getPrecio_habitacion() {
         return precio_habitacion;
     }
@@ -129,22 +133,36 @@ public class Propiedad {
     public long getPropiedad_id() {
         return propiedad_id;
     }
+
     public String getCalle_numero() {
         return calle_numero;
     }
+
     public void setCalle_numero(String calle_numero) {
         this.calle_numero = calle_numero;
     }
+
     public String getCiudad() {
         return ciudad;
     }
+
     public void setCiudad(String ciudad) {
         this.ciudad = ciudad;
     }
+
     public String getCodigo_postal() {
         return codigo_postal;
     }
+
     public void setCodigo_postal(String codigo_postal) {
         this.codigo_postal = codigo_postal;
+    }
+
+    public List<Foto> getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(List<Foto> fotos) {
+        this.fotos = fotos;
     }
 }

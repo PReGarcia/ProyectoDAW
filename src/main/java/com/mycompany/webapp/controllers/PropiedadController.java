@@ -1,10 +1,15 @@
 package com.mycompany.webapp.controllers;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.mycompany.webapp.models.Foto;
 import com.mycompany.webapp.models.Propiedad;
 import com.mycompany.webapp.models.Usuario;
 
@@ -14,12 +19,19 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import jakarta.transaction.UserTransaction;
 
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+    maxFileSize = 1024 * 1024 * 10,      // 10 MB
+    maxRequestSize = 1024 * 1024 * 50    // 50 MB
+)
 @WebServlet(name = "PropiedadController", urlPatterns = { "/propiedades", "/propiedad/*" })
 public class PropiedadController extends HttpServlet {
 
@@ -69,6 +81,7 @@ public class PropiedadController extends HttpServlet {
                     request.setAttribute("msg", "La propiedad no existe");
                     vista += "error.jsp";
                 }
+                break;
 
             default:
                 vista += "error.jsp";
@@ -102,6 +115,7 @@ public class PropiedadController extends HttpServlet {
                     descripcion, propietario);
             try{
                 nuevaPropiedad(p);
+                guardarFotos(p, request.getParts());
                 response.sendRedirect("http://localhost:8080/WebApp/");
             } catch (Exception e) {
                 request.setAttribute("msg", "Error: datos no válidos");
@@ -132,6 +146,38 @@ public class PropiedadController extends HttpServlet {
                 Log.severe("Error al hacer rollback: " + ex.getMessage());
             }
         }
+    }
+
+    public void guardarFotos(Propiedad p, Collection<Part> fotosForm){
+        String uploadPath = getServletContext().getRealPath("") + File.separator + "static" +File.separator + "img" + File.separator + "propiedades" + File.separator + p.getPropiedad_id();
+        File uploadDir = new File(uploadPath);
+        if(!uploadDir.exists()) uploadDir.mkdir();
+
+        List<Foto> listaFotos = new ArrayList<>();  
+
+        try{
+            for(Part part: fotosForm){
+                if(part.getName().equals("imagenes") && part.getSize() > 0){
+                    String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
+                    part.write(uploadPath + File.separator + fileName);
+
+                    String rutaRelativa = "static/img/propiedades" + p.getPropiedad_id() + File.separator + fileName;
+                    Foto foto = new Foto(rutaRelativa, p);
+                    listaFotos.add(foto);
+                }
+            }
+
+            if(!listaFotos.isEmpty()){
+                utx.begin();
+                for(Foto f: listaFotos){
+                    em.persist(listaFotos);
+                }
+                utx.commit();
+            }
+        }catch(Exception e){
+            Log.severe("Error: " + e.getMessage());
+        }
+
     }
         
 }
