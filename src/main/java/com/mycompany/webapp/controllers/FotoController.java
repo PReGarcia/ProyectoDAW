@@ -13,6 +13,7 @@ import com.mycompany.webapp.models.Foto;
 import com.mycompany.webapp.models.Propiedad;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -42,6 +43,7 @@ public class FotoController extends HttpServlet {
 
     private static final Logger Log = Logger.getLogger(UsuarioController.class.getName());
     */
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String accion = request.getPathInfo();
@@ -59,30 +61,7 @@ public class FotoController extends HttpServlet {
         rd.forward(request, response);
     }
 
-    /*@Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String accion = request.getPathInfo();
-        switch (accion) {
-            case "/guardar":
-                Long num = 1L;
-                TypedQuery<Propiedad> query = em.createNamedQuery("Propiedad.getById", Propiedad.class);
-                query.setParameter("propiedad_id", num);
-                try {
-                    guardarFotos(query.getSingleResult(), request.getParts());
-                } catch (SecurityException | IllegalStateException | IOException | NotSupportedException
-                        | SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException
-                        | ServletException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                response.sendRedirect("http://localhost:8080/WebApp/");
-                break;
-
-            default:
-                break;
-        }
-    }*/
+    
 
     public void guardarFotos( UserTransaction utx, EntityManager em,Propiedad p, Collection<Part> fotosForm)
             throws IOException, NotSupportedException, SystemException, SecurityException, IllegalStateException,
@@ -132,4 +111,38 @@ public class FotoController extends HttpServlet {
 
     }
 
+    public List<Foto> findByPropiedad(EntityManager em, Propiedad p) {
+        TypedQuery<Foto> query = em.createNamedQuery("Foto.findByPropiedad", Foto.class);
+        query.setParameter("propiedad", p);
+
+        return query.getResultList();
+
+    }
+
+
+
+/*@Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String accion = request.getPathInfo();
+        switch (accion) {
+            case "/guardar":
+                Long num = 1L;
+                TypedQuery<Propiedad> query = em.createNamedQuery("Propiedad.getById", Propiedad.class);
+                query.setParameter("propiedad_id", num);
+                try {
+                    guardarFotos(query.getSingleResult(), request.getParts());
+                } catch (SecurityException | IllegalStateException | IOException | NotSupportedException
+                        | SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException
+                        | ServletException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                response.sendRedirect("http://localhost:8080/WebApp/");
+                break;
+
+            default:
+                break;
+        }
+    }*/
 }

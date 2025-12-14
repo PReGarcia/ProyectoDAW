@@ -32,8 +32,13 @@ public class PropiedadController extends HttpServlet {
     private EntityManager em;
     @Resource
     private UserTransaction utx;
+    private FotoController fc;
 
     private static final Logger Log = Logger.getLogger(UsuarioController.class.getName());
+
+    public PropiedadController(){
+        fc = new FotoController();
+    }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -66,6 +71,7 @@ public class PropiedadController extends HttpServlet {
                 long id = Long.parseLong(request.getParameter("id"));
 
                 Propiedad p = em.find(Propiedad.class, id);
+                request.setAttribute("imagenes", fc.findByPropiedad(em,p)); 
                 if (p != null) {
                     request.setAttribute("p", p);
                     vista += "detalle.jsp";
@@ -90,9 +96,10 @@ public class PropiedadController extends HttpServlet {
         String accion = request.getPathInfo();
         if (accion.equals("/guardar")) {
             try {
-                FotoController fc = new FotoController();
                 Propiedad p = nuevaPropiedad(request);
+                System.out.println("LLEga a antes de guardar las fotos");
                 fc.guardarFotos(utx, em, p, request.getParts());
+                System.out.println("LLEga despues de guardar las fotos");
                 response.sendRedirect("http://localhost:8080/WebApp/");
             } catch (Exception e) {
                 request.setAttribute("msg", "Error: datos no válidos");

@@ -5,10 +5,14 @@
 
             <div class="propiedad-card" style="box-shadow: none; border: 1px solid #ddd;">
 
-                <div class="propiedad-img-container" style="height: 400px;">
-                    <img src="${pageContext.request.contextPath}/static/img/placeholder_house.jpg"
-                        alt="Imagen de ${p.nombre}" class="propiedad-img">
-                </div>
+                <c:if test="${!empty requestScope.fotos}" > 
+                    <c:forEach var="f" items="${requestScope.fotos}">
+                        <div class="propiedad-img-container" style="height: 400px;">
+                            <img src="${pageContext.request.contextPath}/${f.ruta}"
+                            alt="Imagen de ${p.nombre}" class="propiedad-img">
+                        </div>
+                    </c:forEach>
+                </c:if>
 
                 <div class="propiedad-info">
                     <h1 style="color: #2c3e50; font-size: 2rem;">${p.nombre}</h1>
