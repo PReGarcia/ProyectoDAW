@@ -1,18 +1,10 @@
 package com.mycompany.webapp.controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.mycompany.webapp.models.Foto;
 import com.mycompany.webapp.models.Propiedad;
 import com.mycompany.webapp.models.Usuario;
 
@@ -27,7 +19,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 import jakarta.transaction.UserTransaction;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
@@ -98,25 +89,10 @@ public class PropiedadController extends HttpServlet {
             throws ServletException, IOException {
         String accion = request.getPathInfo();
         if (accion.equals("/guardar")) {
-            String nombre = request.getParameter("nombre");
-            String calle_numero = request.getParameter("calle_numero");
-            String ciudad = request.getParameter("ciudad");
-            String codigo_postal = request.getParameter("codigo_postal");
-            double precio_habitacion = Double.parseDouble(request.getParameter("precio_habitacion"));
-            int habitaciones = Integer.parseInt(request.getParameter("habitaciones"));
-            int baños = Integer.parseInt(request.getParameter("banos"));
-            double latitud = Double.parseDouble(request.getParameter("latitud"));
-            double longitud = Double.parseDouble(request.getParameter("longitud"));
-            String descripcion = request.getParameter("descripcion");
-            Usuario propietario = (Usuario) request.getSession().getAttribute("user");
-
-            Propiedad p = new Propiedad(nombre, calle_numero, ciudad, codigo_postal,
-                    precio_habitacion, habitaciones, baños, latitud, longitud,
-                    descripcion, propietario);
             try {
                 FotoController fc = new FotoController();
-                nuevaPropiedad(p);
-                fc.guardarFotos(p, request.getParts());
+                Propiedad p = nuevaPropiedad(request);
+                fc.guardarFotos(utx, em, p, request.getParts());
                 response.sendRedirect("http://localhost:8080/WebApp/");
             } catch (Exception e) {
                 request.setAttribute("msg", "Error: datos no válidos");
@@ -133,7 +109,22 @@ public class PropiedadController extends HttpServlet {
         return q1.getResultList();
     }
 
-    public void nuevaPropiedad(Propiedad p) {
+    public Propiedad nuevaPropiedad(HttpServletRequest request) {
+            String nombre = request.getParameter("nombre");
+            String calle_numero = request.getParameter("calle_numero");
+            String ciudad = request.getParameter("ciudad");
+            String codigo_postal = request.getParameter("codigo_postal");
+            double precio_habitacion = Double.parseDouble(request.getParameter("precio_habitacion"));
+            int habitaciones = Integer.parseInt(request.getParameter("habitaciones"));
+            int baños = Integer.parseInt(request.getParameter("banos"));
+            double latitud = Double.parseDouble(request.getParameter("latitud"));
+            double longitud = Double.parseDouble(request.getParameter("longitud"));
+            String descripcion = request.getParameter("descripcion");
+            Usuario propietario = (Usuario) request.getSession().getAttribute("user");
+
+            Propiedad p = new Propiedad(nombre, calle_numero, ciudad, codigo_postal,
+                    precio_habitacion, habitaciones, baños, latitud, longitud,
+                    descripcion, propietario);
         try {
             utx.begin();
             em.persist(p);
@@ -147,6 +138,8 @@ public class PropiedadController extends HttpServlet {
                 Log.severe("Error al hacer rollback: " + ex.getMessage());
             }
         }
+
+        return p;
     }
 
     public Propiedad getById(Long id){
@@ -155,5 +148,6 @@ public class PropiedadController extends HttpServlet {
 
         return query.getSingleResult();
     }
+
 
 }
