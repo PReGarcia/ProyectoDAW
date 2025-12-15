@@ -1,2 +1,3 @@
 <%@page contentType = "text/html" pageEncoding="UTF-8" %>
-        <p>error</p>
+<p text="${requestScope.msg}"></p>
+<p>error</p>

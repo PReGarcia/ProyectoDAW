@@ -1,6 +1,8 @@
 package com.mycompany.webapp.controllers;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,13 +72,8 @@ public class UsuarioController extends HttpServlet {
             throws ServletException, IOException {
         String accion = request.getPathInfo();
         if (accion.equals("/guardar")) {
-            String name = request.getParameter("nombre");
-            String apellido = request.getParameter("apellidos");
-            String email = request.getParameter("email");
-            String contra = request.getParameter("contra");
             try {
-                Usuario u = new Usuario(name, apellido, email, contra);
-                nuevoUsuario(u);
+                nuevoUsuario(request);
                 response.sendRedirect("http://localhost:8080/WebApp/");
             } catch (Exception e) {
                 request.setAttribute("msg", "Error: datos no válidos");
@@ -94,7 +91,6 @@ public class UsuarioController extends HttpServlet {
             HttpSession session = request.getSession();
             String msg;
             String style;
-            String newRequest;
             if (u != null) {
                 session.setAttribute("user", u);
                 session.setAttribute("rol", u.getRol());
@@ -104,10 +100,10 @@ public class UsuarioController extends HttpServlet {
                 style = "danger";
                 session.removeAttribute("user");
                 session.removeAttribute("role");
-                newRequest = "/WebApp/usuario/entrar";
                 request.setAttribute("msg", msg);
                 request.setAttribute("style", style);
-                RequestDispatcher rd = request.getRequestDispatcher(newRequest);
+                request.setAttribute("view", "/WEB-INF/views/usuario/usuarioLogin.jsp");
+                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
                 rd.forward(request, response);
             }
             
@@ -143,7 +139,15 @@ public class UsuarioController extends HttpServlet {
         }
     }
 
-    public void nuevoUsuario(Usuario u) {
+    private void nuevoUsuario(HttpServletRequest request) {
+        String name = request.getParameter("nombre");
+        String apellido = request.getParameter("apellidos");
+        String email = request.getParameter("email");
+        String contra = request.getParameter("contra");
+
+        String pass_digest = encriptPassword(contra);
+
+        Usuario u = new Usuario(name, apellido, email, pass_digest);
         try {
             utx.begin();
             em.persist(u);
@@ -155,7 +159,7 @@ public class UsuarioController extends HttpServlet {
         }
     }
 
-    public Usuario findByCredentials(String email, String pwd) {
+    private Usuario findByCredentials(String email, String pwd) {
         Usuario user = null;
         try {
             List<Usuario> users;
@@ -174,7 +178,29 @@ public class UsuarioController extends HttpServlet {
         return user;
     }
 
-    public void logout(HttpServletRequest request) {
+    private String encriptPassword(String pwd) {
+
+        String pass_digest = null;
+
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+            md.update(pwd.getBytes());
+            byte[] digest = md.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            pass_digest = sb.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            Log.log(Level.SEVERE, "EXCEPTION: ", ex);
+        }
+
+        return pass_digest;
+
+    }
+
+    private void logout(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.invalidate();
     }

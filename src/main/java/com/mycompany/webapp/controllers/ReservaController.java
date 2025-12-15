@@ -1,7 +1,5 @@
 package com.mycompany.webapp.controllers;
 
-import java.util.logging.Logger;
-
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,10 +16,10 @@ public class ReservaController extends HttpServlet{
     @Resource
     private UserTransaction utx;
 
-    private static final Logger Log = Logger.getLogger(UsuarioController.class.getName());
+    //private static final Logger Log = Logger.getLogger(UsuarioController.class.getName());
 
     public void doGet(HttpServletRequest request, HttpServletResponse response){
-        String accion = "/reservas";
+        //String accion = "/reservas";
         if(request.getServletPath().equals("/reserva")){
             
         }
