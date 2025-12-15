@@ -42,6 +42,15 @@ public class Propiedad {
     @Column(nullable = false)
     private double longitud;
     private String descripcion;
+    private String portada;
+    public String getPortada() {
+        return portada;
+    }
+
+    public void setPortada(String portada) {
+        this.portada = portada;
+    }
+
     @ManyToOne
     @JoinColumn(name = "id_propietario", nullable = false)
     private Usuario propietario;

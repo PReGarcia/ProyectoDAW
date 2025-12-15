@@ -12,7 +12,7 @@
                         <div class="propiedad-card">
 
                             <div class="propiedad-img-container">
-                                <img src="${pageContext.request.contextPath}/static/img/placeholder_house.jpg"
+                                <img src="${pageContext.request.contextPath}/${p.getPortada()}"
                                     alt="Imagen de ${p.nombre}" class="propiedad-img">
                             </div>
 

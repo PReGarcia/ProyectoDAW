@@ -32,7 +32,11 @@
             <label for="banos">Número de Baños:</label>
             <input type="number" name="banos" required>
             <br>
-
+            
+            <label for="portada">Fotos de perfil de la propiedad:</label>
+            <input type="file" name="portada" accept="image/*" required>
+            <br>
+            
             <label for="imagenes">Fotos de la propiedad:</label>
             <input type="file" name="imagenes" multiple accept="image/*">
             <br>
