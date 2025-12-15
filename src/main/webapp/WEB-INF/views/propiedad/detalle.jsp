@@ -3,18 +3,31 @@
 
         <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
 
-            <div class="propiedad-card" style="box-shadow: none; border: 1px solid #ddd;">
+           <div class="propiedad-card" style="box-shadow: none; border: 1px solid #ddd;">
 
-                <c:if test="${!empty requestScope.imagenes}" > 
-                    <c:forEach var="f" items="${requestScope.imagenes}">
-                        <div class="propiedad-img-container" style="height: 400px;">
-                            <img src="${pageContext.request.contextPath}/${f.getUrl()}"
-                            alt="Imagen de ${p.nombre}" class="propiedad-img">
-                        </div>
-                    </c:forEach>
+                <c:if test="${!empty requestScope.imagenes}">
+                    <div class="carousel">
+                        
+                        <c:forEach var="f" items="${requestScope.imagenes}" varStatus="status">
+                            <div class="carousel-item ${status.first ? 'active' : ''}">
+                                <img src="${pageContext.request.contextPath}/${f.getUrl()}"
+                                     alt="Imagen de ${p.nombre}" class="carousel-img">
+                            </div>
+                        </c:forEach>
+
+                        <c:if test="${requestScope.imagenes.size() > 1}">
+                            <button class="carousel-btn prev">&#10094;</button>
+                            <button class="carousel-btn next">&#10095;</button>
+                        </c:if>
+                        
+                    </div>
                 </c:if>
-
-                <div class="propiedad-info">
+                <c:if test="${empty requestScope.imagenes}">
+                     <div class="carousel" style="display:flex; align-items:center; justify-content:center; color:#7f8c8d;">
+                        <p>Sin imágenes disponibles</p>
+                    </div>
+                </c:if>
+                <div class="propiedad-info"> 
                     <h1 style="color: #2c3e50; font-size: 2rem;">${p.nombre}</h1>
 
                     <p class="propiedad-ubicacion" style="font-size: 1.2rem;">

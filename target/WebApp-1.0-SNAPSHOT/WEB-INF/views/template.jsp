@@ -46,6 +46,8 @@
             </main>
 
             <script src="${pageContext.request.contextPath}/static/js/menu.js"></script>
+            <script src="${pageContext.request.contextPath}/static/js/validaciones.js"></script>
+            <script src="${pageContext.request.contextPath}/static/js/carrusel.js"></script>
             <footer id="footer">
                 <p>&copy; 2024 Mi Aplicación de Propiedades. Todos los derechos reservados.</p>
             </footer>

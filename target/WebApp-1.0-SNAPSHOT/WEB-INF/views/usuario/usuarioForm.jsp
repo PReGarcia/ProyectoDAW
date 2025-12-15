@@ -4,19 +4,19 @@
             <form action="${pageContext.request.contextPath}/usuario/guardar" method="POST" class="form">
 
                 <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" required placeholder="Nombre">
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre">
                 <br>
 
                 <label for="apellidos">Apellidos:</label>
-                <input type="text" id="apellidos" name="apellidos" required placeholder="Apellidos">
+                <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos">
                 <br>
 
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
+                <input type="email" id="email" name="email" placeholder="ejemplo@correo.com">
                 <br>
 
                 <label for="contra">Contraseña:</label>
-                <input type="password" id="contra" name="contra" required placeholder="Contraseña">
+                <input type="password" id="contra" name="contra" placeholder="Contraseña">
                 <br>
 
                 <input type="submit" value="Guardar Usuario" class="button">

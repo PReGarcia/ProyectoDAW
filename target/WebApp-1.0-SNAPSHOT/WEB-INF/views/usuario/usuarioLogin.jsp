@@ -5,11 +5,11 @@
 
             <form action="${pageContext.request.contextPath}/usuario/validar" method="POST" class="form">
                 <label for="email">Correo Electrónico:</label>
-                <input type="email" id="email" name="email" required placeholder="usuario@ejemplo.com">
+                <input type="email" id="email" name="email" placeholder="usuario@ejemplo.com">
                 <br>
 
                 <label for="contra">Contraseña:</label>
-                <input type="password" id="contra" name="contra" required placeholder="Contraseña">
+                <input type="password" id="contra" name="contra" placeholder="Contraseña">
                 <br>
 
                 <input type="submit" value="Entrar" class="button">
