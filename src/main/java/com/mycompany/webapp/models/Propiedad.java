@@ -17,7 +17,8 @@ import jakarta.persistence.OneToMany;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Propiedad.findAll", query = "SELECT p FROM Propiedad p"),
-        @NamedQuery(name = "Propiedad.getById", query = "SELECT p FROM Propiedad p WHERE p.propiedad_id = :propiedad_id")
+        @NamedQuery(name = "Propiedad.getById", query = "SELECT p FROM Propiedad p WHERE p.propiedad_id = :propiedad_id"),
+        @NamedQuery(name = "Propiedad.findByPropietario", query = "SELECT p FROM Propiedad p WHERE p.propietario = :propietario")
 })
 public class Propiedad {
     @Id

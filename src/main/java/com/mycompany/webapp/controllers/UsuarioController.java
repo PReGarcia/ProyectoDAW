@@ -45,6 +45,58 @@ public class UsuarioController extends HttpServlet {
             }
         }
         switch (accion) {
+            // Dentro del switch(accion)
+            case "/admin/usuarios":
+                if (!esAdmin(request)) {
+                    response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+                    return;
+                }
+
+                List<Usuario> listaUsuarios = em.createNamedQuery("Usuario.findAll", Usuario.class).getResultList();
+
+                request.setAttribute("usuarios", listaUsuarios);
+                vista += "listaUsuarios.jsp"; // Crearemos esta carpeta y vista
+                break;
+
+            case "/admin/editar":
+                if (!esAdmin(request)) {
+                    response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+                    return;
+                }
+                
+                try {
+                    long id = Long.parseLong(request.getParameter("id"));
+                    Usuario uEdit = em.find(Usuario.class, id);
+                    if (uEdit != null) {
+                        request.setAttribute("u", uEdit);
+                        vista = "admin/usuarioFormAdmin.jsp"; // Crearemos esta vista nueva
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/usuario/admin/usuarios");
+                        return;
+                    }
+                } catch (Exception e) {
+                    response.sendRedirect(request.getContextPath() + "/usuario/admin/usuarios");
+                    return;
+                }
+                break;
+
+            case "/admin/eliminar":
+                if (!esAdmin(request))
+                    return;
+
+                // Lógica para borrar usuario
+                try {
+                    long id = Long.parseLong(request.getParameter("id"));
+                    utx.begin();
+                    Usuario u = em.find(Usuario.class, id);
+                    if (u != null)
+                        em.remove(u);
+                    utx.commit();
+                } catch (Exception e) {
+                    // rollback...
+                }
+                response.sendRedirect(request.getContextPath() + "/usuario/admin/usuarios");
+                return;
             case "/nuevo": {
                 vista += "usuarioForm.jsp";
                 break;
@@ -88,25 +140,12 @@ public class UsuarioController extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            HttpSession session = request.getSession();
-            String msg;
-            String style;
-            if (u != null) {
-                session.setAttribute("user", u);
-                session.setAttribute("rol", u.getRol());
+            if (crearSesionUsuario(request, u)) {
                 response.sendRedirect(request.getContextPath() + "/propiedades");
             } else {
-                msg = "ERROR: Login incorrecto";
-                style = "danger";
-                session.removeAttribute("user");
-                session.removeAttribute("role");
-                request.setAttribute("msg", msg);
-                request.setAttribute("style", style);
-                request.setAttribute("view", "/WEB-INF/views/usuario/usuarioLogin.jsp");
                 RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
                 rd.forward(request, response);
             }
-            
         } else {
             RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/error.jsp");
             rd.forward(request, response);
@@ -120,26 +159,24 @@ public class UsuarioController extends HttpServlet {
         String email = request.getParameter("email");
         String pwd = request.getParameter("contra");
         if (email.isEmpty() || pwd.isEmpty()) {
-                throw new Exception("Datos no válidos");
-            }
+            throw new Exception("Datos no válidos");
+        }
 
-        try
-        {
-            user = findByCredentials(email, pwd);
+        try {
+            user = findByCredentials(email, encriptPassword(pwd));
         } catch (Exception e) {
             Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, "exception caught", e);
             throw new RuntimeException(e);
         }
 
-        if(user == null){
+        if (user == null) {
             throw new Exception("Usuario no encontrado");
-        }
-        else{
+        } else {
             return user;
         }
     }
 
-    private void nuevoUsuario(HttpServletRequest request) {
+    private Usuario nuevoUsuario(HttpServletRequest request) {
         String name = request.getParameter("nombre");
         String apellido = request.getParameter("apellidos");
         String email = request.getParameter("email");
@@ -153,6 +190,7 @@ public class UsuarioController extends HttpServlet {
             em.persist(u);
             Log.log(Level.INFO, "New User saved");
             utx.commit();
+            return u;
         } catch (Exception e) {
             Log.log(Level.SEVERE, "exception caught", e);
             throw new RuntimeException(e);
@@ -203,5 +241,30 @@ public class UsuarioController extends HttpServlet {
     private void logout(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.invalidate();
+    }
+
+    private boolean crearSesionUsuario(HttpServletRequest request, Usuario u) {
+        HttpSession session = request.getSession();
+        String msg;
+        String style;
+        if (u != null) {
+            session.setAttribute("user", u);
+            session.setAttribute("rol", u.getRol());
+            return true;
+        } else {
+            msg = "ERROR: Login incorrecto";
+            style = "danger";
+            session.removeAttribute("user");
+            session.removeAttribute("role");
+            request.setAttribute("msg", msg);
+            request.setAttribute("style", style);
+            request.setAttribute("view", "/WEB-INF/views/usuario/usuarioLogin.jsp");
+            return false;
+        }
+    }
+
+    private boolean esAdmin(HttpServletRequest request) {
+        Usuario u = (Usuario) request.getSession().getAttribute("user");
+        return u != null && "ADMIN".equals(u.getRol());
     }
 }

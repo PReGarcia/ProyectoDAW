@@ -191,11 +191,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     limpiarError(longitud);
                 }
             }
+            const idInput = document.querySelector('input[name="id"]');
+            const portadaInput = document.querySelector('input[name="portada"]');
+            
+            const esCreacion = !idInput || idInput.value.trim() === "";
 
-            // Validar portada
             const portada = formPropiedad.querySelector('input[name="portada"]');
             if (portada) {
-                if (portada.files.length === 0) {
+                if (esCreacion && portada.files.length === 0) {
                     mostrarError(portada, "Debes seleccionar una imagen de portada.");
                     esValido = false;
                 } else {

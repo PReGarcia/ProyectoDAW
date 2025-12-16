@@ -21,14 +21,26 @@
 
                     <div class="nav-left">
                         <a href="${pageContext.request.contextPath}/propiedades">Inicio</a>
+                        <c:if test="${sessionScope.user.rol == 'ADMIN'}">
+                                <div class="dropdown-content">
+                                    <a href="${pageContext.request.contextPath}/usuario/admin/usuarios">Gestionar
+                                        Usuarios</a>
+                                    <a href="${pageContext.request.contextPath}/propiedad/admin/lista">Gestionar
+                                        Propiedades</a>
+                                    <a href="${pageContext.request.contextPath}/reserva/admin/lista">Ver Reservas</a>
+                                </div>
+                        </c:if>
                     </div>
 
                     <div class="nav-right">
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <a href="${pageContext.request.contextPath}/propiedad/nuevo">Registrar Propiedad</a>
-                                <a href="${pageContext.request.contextPath}/usuario/perfil">Hola,
-                                    ${sessionScope.user.nombre}</a>
+
+                                <c:if test="${sessionScope.user.getRol() == 'PROP'}">
+                                <a href="${pageContext.request.contextPath}/propiedad/mis-propiedades">Mis
+                                    Propiedades</a>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/usuario/salir"
                                     style="color: #e74c3c;">(Salir)</a>
                             </c:when>

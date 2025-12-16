@@ -2,7 +2,11 @@
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <div class="container">
             <h1>Bienvenido</h1>
-
+            <c:if test="${not empty requestScope.msg}">
+                <div class="${requestScope.style}" style="padding: 10px; margin-bottom: 15px; border-radius: 5px; color: white; background-color: #e74c3c; text-align: center;">
+                    ${requestScope.msg}
+                </div>
+            </c:if>
             <form action="${pageContext.request.contextPath}/usuario/validar" method="POST" class="form">
                 <label for="email">Correo Electrónico:</label>
                 <input type="email" id="email" name="email" placeholder="usuario@ejemplo.com">
