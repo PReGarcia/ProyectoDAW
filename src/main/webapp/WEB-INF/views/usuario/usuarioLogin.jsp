@@ -1,9 +1,9 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <div class="container">
-            <h1>Bienvenido</h1>
+            <h1 class="text-center">Bienvenido</h1>
             <c:if test="${not empty requestScope.msg}">
-                <div class="${requestScope.style}" style="padding: 10px; margin-bottom: 15px; border-radius: 5px; color: white; background-color: #e74c3c; text-align: center;">
+                <div class="alert ${requestScope.style == 'error' ? 'alert-error' : 'alert-info'}">
                     ${requestScope.msg}
                 </div>
             </c:if>
@@ -19,5 +19,5 @@
                 <input type="submit" value="Entrar" class="button">
             </form>
 
-            <p>¿No tienes cuenta? <a href="${pageContext.request.contextPath}/usuario/nuevo">Regístrate aquí</a></p>
+            <p class="text-center">¿No tienes cuenta? <a href="${pageContext.request.contextPath}/usuario/nuevo">Regístrate aquí</a></p>
         </div>

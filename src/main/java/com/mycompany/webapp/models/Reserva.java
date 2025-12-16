@@ -80,10 +80,5 @@ public class Reserva{
     public void setEstado(String estado) {
         this.estado = estado;
     }
-    public void setCreadoEn(LocalDate now) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCreadoEn'");
-    }
-    
 
 }

@@ -25,3 +25,40 @@ a {
         color: $primary-dark;
     }
 }
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+
+    &:focus {
+        border-color: $primary-color;
+        outline: none;
+    }
+}
+
+@keyframes fade {
+    from {opacity: .4} 
+    to {opacity: 1}
+}
+
+/* --- INPUTS DE ARCHIVO --- */
+.form-control-file {
+    display: block;
+    width: 100%;
+    margin-bottom: $spacing-md;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px dashed $border-color;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #eee;
+    }
+}

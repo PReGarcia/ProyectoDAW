@@ -22,13 +22,11 @@
                     <div class="nav-left">
                         <a href="${pageContext.request.contextPath}/propiedades">Inicio</a>
                         <c:if test="${sessionScope.user.rol == 'ADMIN'}">
-                            <div class="dropdown-content">
                                 <a href="${pageContext.request.contextPath}/usuario/admin/usuarios">Gestionar
                                     Usuarios</a>
                                 <a href="${pageContext.request.contextPath}/propiedad/admin/lista">Gestionar
                                     Propiedades</a>
                                 <a href="${pageContext.request.contextPath}/reserva/admin/lista">Ver Reservas</a>
-                            </div>
                         </c:if>
                     </div>
 
@@ -41,11 +39,9 @@
                                     <a href="${pageContext.request.contextPath}/propiedad/mis-propiedades">Mis
                                         Propiedades</a>
                                 </c:if>
-                                <%-- NUEVO ENLACE: Mis Reservas. Visible para cualquier usuario logueado --%>
                                     <a class="nav-link"
                                         href="${pageContext.request.contextPath}/reserva/mis-reservas">Mis Reservas</a>
-                                    <a href="${pageContext.request.contextPath}/usuario/salir"
-                                        style="color: #e74c3c;">(Salir)</a>
+                                    <a href="${pageContext.request.contextPath}/usuario/salir" class="nav-link-salir">(Salir)</a>
                             </c:when>
                             <c:otherwise>
                                 <a href="${pageContext.request.contextPath}/usuario/entrar">Iniciar Sesión</a>

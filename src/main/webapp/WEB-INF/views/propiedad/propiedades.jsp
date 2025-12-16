@@ -26,7 +26,7 @@
                                 <div class="propiedad-footer">
                                     <span class="propiedad-precio">${p.precio_habitacion} $ / noche</span>
                                     <a href="${pageContext.request.contextPath}/propiedad/detalle?id=${p.propiedad_id}"
-                                        class="btn-detalle">Ver más</a>
+                                        class="button">Ver más</a>
                                 </div>
                             </div>
 

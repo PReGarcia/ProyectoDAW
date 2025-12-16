@@ -1,8 +1,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<div>
-    <h1>${empty p ? 'Registrar Propiedad' : 'Editar Propiedad'}</h1>
+<div class="container">
+    <h1 class="text-center">${empty p ? 'Registrar Propiedad' : 'Editar Propiedad'}</h1>
     
     <form action="${pageContext.request.contextPath}/propiedad/guardar" method="POST" class="form" enctype="multipart/form-data">
         
@@ -41,11 +41,11 @@
         <br>
         
         <label for="portada">Foto de portada ${not empty p ? '(Dejar vacío para mantener la actual)' : ''}:</label>
-        <input type="file" name="portada" accept="image/*" ${empty p ? 'required' : ''}>
+        <input type="file" name="portada" accept="image/*" ${empty p ? 'required' : ''} class="form-control-file">
         <br>
         
         <label for="imagenes">Fotos extra (se añadirán a las existentes):</label>
-        <input type="file" name="imagenes" multiple accept="image/*">
+        <input type="file" name="imagenes" multiple accept="image/*" class="form-control-file">
         <br>
 
         <label for="latitud">Latitud:</label>
@@ -59,3 +59,4 @@
         <input type="submit" value="${empty p ? 'Guardar Propiedad' : 'Actualizar Propiedad'}" class="button">
     </form>
 </div>
+<script src="${pageContext.request.contextPath}/static/js/validaciones.js"></script>

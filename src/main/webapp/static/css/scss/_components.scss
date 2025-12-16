@@ -1,5 +1,5 @@
 /* --- BOTONES --- */
-.button, .btn-detalle {
+.button {
     display: inline-block;
     background-color: $primary-color;
     color: $white;
@@ -32,22 +32,6 @@
         margin-bottom: $spacing-sm;
         font-weight: bold;
         color: $secondary-color;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="number"] {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: $spacing-md;
-        border: 1px solid $border-color;
-        border-radius: 4px;
-
-        &:focus {
-            border-color: $primary-color;
-            outline: none;
-        }
     }
 }
 
@@ -179,8 +163,233 @@
     right: 10px;
 }
 
-/* Animación suave */
-@keyframes fade {
-    from {opacity: .4} 
-    to {opacity: 1}
+/* --- VISTA DETALLE --- */
+.detalle-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.propiedad-card.detalle-card {
+    box-shadow: none;
+    border: 1px solid $border-color; 
+}
+
+.detalle-titulo {
+    color: $secondary-color; 
+    font-size: 2rem;
+}
+
+.detalle-subtitulo {
+    font-size: 1.2rem;
+}
+
+/* --- DETALLES ESPECÍFICOS --- */
+.carousel-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7f8c8d;
+    background-color: #ddd; /* Asegura el fondo gris */
+}
+
+.propiedad-features {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    background: #f4f7f6;
+    padding: 15px;
+    border-radius: $border-radius;
+    flex-wrap: wrap; /* Para móviles */
+}
+
+.propiedad-descripcion {
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    margin-right: 10px;
+    
+    &:hover {
+        background-color: darken(#95a5a6, 10%);
+    }
+}
+
+/* --- MAPA Y FOOTER DETALLE --- */
+.mapa-detalle {
+    height: 350px; 
+    width: 100%; 
+    border-radius: $border-radius; 
+    border: 1px solid $border-color;
+    z-index: 1;
+    margin-bottom: 20px;
+}
+
+.detalle-footer {
+    border-top: 1px solid #eee; /* O usa $light-bg si está definido */
+    padding-top: 20px; 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; 
+    gap: 10px;
+}
+
+/* --- TABLAS DE DATOS --- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+
+    th, td {
+        border: 1px solid $border-color; // Asegúrate que $border-color existe en _variables, si no usa #ddd
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f4f4f4;
+    }
+}
+
+/* --- BADGES (ETIQUETAS DE ESTADO) --- */
+.badge {
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: $white;
+    display: inline-block; /* Mejor comportamiento */
+
+    &.badge-success { 
+        background-color: #28a745; 
+    }
+
+    &.badge-pending { 
+        background-color: #ffc107; 
+        color: #333; 
+    }
+}
+
+/* --- ALERTAS / MENSAJES --- */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: $border-radius;
+    
+    &.alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+    }
+    
+    // Podemos añadir la de error aquí para usarla luego en el login
+    &.alert-error {
+        color: $white;
+        background-color: #e74c3c;
+        text-align: center;
+    }
+}
+
+/* --- BOTONES ESPECÍFICOS --- */
+.button-danger {
+    background-color: #e74c3c;
+    &:hover {
+        background-color: darken(#e74c3c, 10%);
+    }
+}
+
+.button-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+/* --- BADGES DE ROLES --- */
+.badge-admin {
+    background-color: #e74c3c; /* Rojo para admin */
+    color: $white;
+}
+
+.badge-prop {
+    background-color: #27ae60; /* Verde para propietario */
+    color: $white;
+}
+
+// Aseguramos que la alerta de error tenga estilo si no lo tenía
+.alert-error {
+    background-color: #e74c3c;
+    color: $white;
+    text-align: center;
+}
+
+/* --- FORMULARIO RESERVA --- */
+.reserva-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+}
+
+.reserva-price {
+    text-align: center;
+    color: #3498db; /* Azul */
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.form-reserva {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Botones adicionales */
+.button-success {
+    background-color: #2ecc71; /* Verde */
+    color: $white;
+    border: none;
+    
+    &:hover {
+        background-color: darken(#2ecc71, 10%);
+    }
+}
+
+.button-secondary {
+    background-color: #95a5a6; /* Gris */
+    color: $white;
+    text-decoration: none; /* Asegura que no parezca un enlace subrayado */
+    
+    &:hover {
+        background-color: darken(#95a5a6, 10%);
+    }
+}
+
+/* Utilidad simple */
+.text-center {
+    text-align: center;
+}
+
+/* --- MENSAJES DE ESTADO --- */
+.mensaje-vacio {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2rem;
+    color: lighten($text-color, 40%);
+    background-color: #f9f9f9;
+    border-radius: $border-radius;
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* Contenedor para hacer la tabla responsive (scroll horizontal en móviles) */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto; /* Permite scroll lateral si no cabe */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    margin-bottom: $spacing-md;
+    border: 1px solid $border-color; /* Opcional: marca el límite del scroll */
+    border-radius: $border-radius;
 }

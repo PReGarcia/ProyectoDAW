@@ -16,7 +16,7 @@
                         <th>Check-out</th>
                         <th>Precio Total</th>
                         <th>Estado</th>
-                        <th>Acciones</th> <%-- AÑADIR ESTA COLUMNA --%>
+                        <th>Acciones</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -31,11 +31,9 @@
                             <td>${reserva.fecha_inicio}</td>
                             <td>${reserva.fecha_fin}</td>
                             <td>
-                                <%-- Formatear como moneda para mejor visualización --%>
                                 <fmt:formatNumber value="${reserva.precio_total}" type="currency" currencySymbol="€"/>
                             </td>
                             <td>
-                                <%-- Usar clases CSS para dar color al estado --%>
                                 <span class="badge badge-${reserva.estado eq 'CONFIRMADA' ? 'success' : 'pending'}">
                                     ${reserva.estado}
                                 </span>
@@ -63,44 +61,3 @@
         </c:otherwise>
     </c:choose>
 </div>
-
-<%-- Estilos básicos para esta tabla (puedes moverlos a main.scss) --%>
-<style>
-.container-narrow {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-.data-table th, .data-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
-.data-table th {
-    background-color: #f4f4f4;
-}
-.badge {
-    padding: 5px 8px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    color: white;
-}
-.badge-success { background-color: #28a745; }
-.badge-pending { background-color: #ffc107; color: #333; }
-.alert {
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-}
-.alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
-}
-</style>
