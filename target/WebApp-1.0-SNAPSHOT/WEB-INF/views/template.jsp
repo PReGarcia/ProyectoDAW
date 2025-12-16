@@ -22,13 +22,13 @@
                     <div class="nav-left">
                         <a href="${pageContext.request.contextPath}/propiedades">Inicio</a>
                         <c:if test="${sessionScope.user.rol == 'ADMIN'}">
-                                <div class="dropdown-content">
-                                    <a href="${pageContext.request.contextPath}/usuario/admin/usuarios">Gestionar
-                                        Usuarios</a>
-                                    <a href="${pageContext.request.contextPath}/propiedad/admin/lista">Gestionar
-                                        Propiedades</a>
-                                    <a href="${pageContext.request.contextPath}/reserva/admin/lista">Ver Reservas</a>
-                                </div>
+                            <div class="dropdown-content">
+                                <a href="${pageContext.request.contextPath}/usuario/admin/usuarios">Gestionar
+                                    Usuarios</a>
+                                <a href="${pageContext.request.contextPath}/propiedad/admin/lista">Gestionar
+                                    Propiedades</a>
+                                <a href="${pageContext.request.contextPath}/reserva/admin/lista">Ver Reservas</a>
+                            </div>
                         </c:if>
                     </div>
 
@@ -38,11 +38,14 @@
                                 <a href="${pageContext.request.contextPath}/propiedad/nuevo">Registrar Propiedad</a>
 
                                 <c:if test="${sessionScope.user.getRol() == 'PROP'}">
-                                <a href="${pageContext.request.contextPath}/propiedad/mis-propiedades">Mis
-                                    Propiedades</a>
+                                    <a href="${pageContext.request.contextPath}/propiedad/mis-propiedades">Mis
+                                        Propiedades</a>
                                 </c:if>
-                                <a href="${pageContext.request.contextPath}/usuario/salir"
-                                    style="color: #e74c3c;">(Salir)</a>
+                                <%-- NUEVO ENLACE: Mis Reservas. Visible para cualquier usuario logueado --%>
+                                    <a class="nav-link"
+                                        href="${pageContext.request.contextPath}/reserva/mis-reservas">Mis Reservas</a>
+                                    <a href="${pageContext.request.contextPath}/usuario/salir"
+                                        style="color: #e74c3c;">(Salir)</a>
                             </c:when>
                             <c:otherwise>
                                 <a href="${pageContext.request.contextPath}/usuario/entrar">Iniciar Sesión</a>
@@ -60,6 +63,8 @@
             <script src="${pageContext.request.contextPath}/static/js/menu.js"></script>
             <script src="${pageContext.request.contextPath}/static/js/validaciones.js"></script>
             <script src="${pageContext.request.contextPath}/static/js/carrusel.js"></script>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
             <footer id="footer">
                 <p>&copy; 2024 Mi Aplicación de Propiedades. Todos los derechos reservados.</p>
             </footer>

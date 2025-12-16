@@ -3,15 +3,15 @@
 
         <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
 
-           <div class="propiedad-card" style="box-shadow: none; border: 1px solid #ddd;">
+            <div class="propiedad-card" style="box-shadow: none; border: 1px solid #ddd;">
 
                 <c:if test="${!empty requestScope.imagenes}">
                     <div class="carousel">
-                        
+
                         <c:forEach var="f" items="${requestScope.imagenes}" varStatus="status">
                             <div class="carousel-item ${status.first ? 'active' : ''}">
-                                <img src="${pageContext.request.contextPath}/${f.getUrl()}"
-                                     alt="Imagen de ${p.nombre}" class="carousel-img">
+                                <img src="${pageContext.request.contextPath}/${f.getUrl()}" alt="Imagen de ${p.nombre}"
+                                    class="carousel-img">
                             </div>
                         </c:forEach>
 
@@ -19,15 +19,16 @@
                             <button class="carousel-btn prev">&#10094;</button>
                             <button class="carousel-btn next">&#10095;</button>
                         </c:if>
-                        
+
                     </div>
                 </c:if>
                 <c:if test="${empty requestScope.imagenes}">
-                     <div class="carousel" style="display:flex; align-items:center; justify-content:center; color:#7f8c8d;">
+                    <div class="carousel"
+                        style="display:flex; align-items:center; justify-content:center; color:#7f8c8d;">
                         <p>Sin imágenes disponibles</p>
                     </div>
                 </c:if>
-                <div class="propiedad-info"> 
+                <div class="propiedad-info">
                     <h1 style="color: #2c3e50; font-size: 2rem;">${p.nombre}</h1>
 
                     <p class="propiedad-ubicacion" style="font-size: 1.2rem;">
@@ -105,8 +106,8 @@
                             <a href="${pageContext.request.contextPath}/propiedades" class="button"
                                 style="background-color: #95a5a6; margin-right: 10px;">Volver</a>
                             <c:if test="${not empty sessionScope.user}">
-                                <button class="button" onclick="alert('Funcionalidad de reserva próximamente')">Reservar
-                                    Ahora</button>
+                                <a href="${pageContext.request.contextPath}/reserva/nueva?propiedadId=${p.getPropiedad_id()}"
+                                    class="button">Reservar Ahora</a>
                             </c:if>
                             <c:if test="${empty sessionScope.user}">
                                 <a href="${pageContext.request.contextPath}/usuario/entrar" class="button">Inicia sesión
