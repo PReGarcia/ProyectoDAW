@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,327 +30,379 @@ import jakarta.transaction.UserTransaction;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
         maxFileSize = 1024 * 1024 * 10, // 10 MB
-        maxRequestSize = 1024 * 1024 * 50 // 50 MB
+        maxRequestSize = 1024 * 1024 * 200 // 50 MB
 )
 @WebServlet(name = "PropiedadController", urlPatterns = { "/propiedades", "/propiedad/*" })
 public class PropiedadController extends HttpServlet {
 
     @PersistenceContext(unitName = "WebAppPU")
     private EntityManager em;
+
     @Resource
     private UserTransaction utx;
 
-    private static final Logger Log = Logger.getLogger(UsuarioController.class.getName());
+    private static final Logger Log = Logger.getLogger(PropiedadController.class.getName());
+
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String vista = "/WEB-INF/views/propiedad/";
-        String accion = "/propiedades";
-        if (request.getServletPath().equals("/propiedad")) {
-            if (request.getPathInfo() != null) {
-                accion = request.getPathInfo();
-            } else {
-                accion = "/error";
-            }
+
+        String path = request.getServletPath(); // "/propiedades" o "/propiedad"
+        String accion = request.getPathInfo(); // "/detalle", "/nuevo", etc.
+
+        if ("/propiedades".equals(path) && (accion == null || accion.equals("/"))) {
+            listarPublicas(request, response);
+            return;
         }
+
+        if (accion == null)
+            accion = "/error";
+
         switch (accion) {
-
-            // En doGet
+            case "/api/buscar":
+                buscarPropiedadesJson(request, response);
+                break;
             case "/admin/lista":
-                if (!esAdmin(request)) {
-                    response.sendRedirect("...");
-                    return;
-                }
-
-                List<Propiedad> todas = em.createNamedQuery("Propiedad.findAll", Propiedad.class).getResultList();
-                request.setAttribute("propiedades", todas);
-                vista += "listaPropiedades.jsp";
+                listarAdmin(request, response);
                 break;
             case "/mis-propiedades":
-                Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("user");
-
-                if (usuarioLogueado != null) {
-                    request.setAttribute("propiedades", findByPropietario(usuarioLogueado));
-                    vista += "misPropiedades.jsp";
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/usuario/entrar");
-                    return;
-                }
+                listarMisPropiedades(request, response);
                 break;
-            case "/propiedades":
-                request.setAttribute("propiedades", findAll());
-                vista += "propiedades.jsp";
-                break;
-
             case "/nuevo":
-                if (request.getSession().getAttribute("user") != null) {
-                    vista += "propiedadForm.jsp";
-                } else {
-                    response.sendRedirect("/WebApp/usuario/entrar");
-                    return;
-                }
+                mostrarFormularioNuevo(request, response);
                 break;
-
             case "/detalle":
-                long id = Long.parseLong(request.getParameter("id"));
-
-                Propiedad p = em.find(Propiedad.class, id);
-                request.setAttribute("imagenes", findByPropiedad(em, p));
-                if (p != null) {
-                    request.setAttribute("p", p);
-                    vista += "detalle.jsp";
-                } else {
-                    request.setAttribute("msg", "La propiedad no existe");
-                    vista += "error.jsp";
-                }
+                mostrarDetalle(request, response);
                 break;
-
             case "/editar":
-                long idEditar = Long.parseLong(request.getParameter("id"));
-                Propiedad pEditar = em.find(Propiedad.class, idEditar);
-
-                Usuario uSesion = (Usuario) request.getSession().getAttribute("user");
-                if (pEditar != null && uSesion != null
-                        && pEditar.getPropietario().getUsuario_id() == uSesion.getUsuario_id()) {
-                    request.setAttribute("p", pEditar); // Pasamos la propiedad para rellenar el formulario
-                    vista += "propiedadForm.jsp";
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/propiedades");
-                    return;
-                }
+                mostrarFormularioEditar(request, response);
                 break;
-
             case "/eliminar":
-                try {
-                    long idEliminar = Long.parseLong(request.getParameter("id"));
-                    utx.begin();
-                    Propiedad pEliminar = em.find(Propiedad.class, idEliminar);
-
-                    Usuario uActual = (Usuario) request.getSession().getAttribute("user");
-                    boolean esDueño = pEliminar.getPropietario().getUsuario_id() == uActual.getUsuario_id();
-                    boolean esAdmin = "ADMIN".equals(uActual.getRol());
-
-                    if (pEliminar != null && (esDueño || esAdmin)) {
-                        em.remove(pEliminar);
-                        utx.commit();
-                    } else {
-                        utx.rollback();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    try {
-                        utx.rollback();
-                    } catch (Exception ex) {
-                    }
-                }
-                response.sendRedirect(request.getContextPath() + "/propiedad/mis-propiedades");
-                return;
-
+                eliminarPropiedad(request, response);
+                break;
             default:
-                vista += "error.jsp";
+                forwardToView(request, response, "/WEB-INF/views/error.jsp");
                 break;
         }
-        request.setAttribute("view", vista);
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
-        rd.forward(request, response);
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String accion = request.getPathInfo();
-        if (accion.equals("/guardar")) {
-            String idStr = request.getParameter("id");
-            try {
-                if (idStr != null && !idStr.isEmpty()) {
-                    // Si hay ID, es una edición
-                    procesarEdicion(request, Long.parseLong(idStr));
-                } else {
-                    // Si no hay ID, es una creación nueva
-                    procesarCreacion(request);
-                }
-                // Si todo sale bien, redirigimos
-                response.sendRedirect(request.getContextPath() + "/propiedad/mis-propiedades");
 
-            } catch (Exception e) {
-                // Manejo centralizado de errores
-                Log.log(Level.SEVERE, "Error al guardar propiedad", e);
-                request.setAttribute("msg", "Error al procesar la propiedad: " + e.getMessage());
-                request.setAttribute("view", "/WEB-INF/views/error.jsp");
-                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
-                rd.forward(request, response);
-            }
+        if ("/guardar".equals(accion)) {
+            guardarPropiedad(request, response);
         } else {
-            // Manejo de otras acciones POST si las hubiera
             response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
-
     }
 
-    public List<Propiedad> findAll() {
-        TypedQuery<Propiedad> q1 = em.createNamedQuery("Propiedad.findAll", Propiedad.class);
-        return q1.getResultList();
-    }
 
-    public Propiedad nuevaPropiedad(HttpServletRequest request) {
-        String nombre = request.getParameter("nombre");
-        String calle_numero = request.getParameter("calle_numero");
-        String ciudad = request.getParameter("ciudad");
-        String codigo_postal = request.getParameter("codigo_postal");
-        double precio_habitacion = Double.parseDouble(request.getParameter("precio_habitacion"));
-        int habitaciones = Integer.parseInt(request.getParameter("habitaciones"));
-        int baños = Integer.parseInt(request.getParameter("banos"));
-        double latitud = Double.parseDouble(request.getParameter("latitud"));
-        double longitud = Double.parseDouble(request.getParameter("longitud"));
-        String descripcion = request.getParameter("descripcion");
-        Usuario propietario = (Usuario) request.getSession().getAttribute("user");
-
-        Propiedad p = new Propiedad(nombre, calle_numero, ciudad, codigo_postal,
-                precio_habitacion, habitaciones, baños, latitud, longitud,
-                descripcion, propietario);
-        return p;
-    }
-
-    private String guardarFotos(Propiedad p, Collection<Part> fotosForm) {
-        String url_perfil = "";
-        String carpetaRelativa = "static/img/propiedades/";
-        String rutaAbsoluta = getServletContext().getRealPath(carpetaRelativa);
-        rutaAbsoluta += File.separator + p.getPropiedad_id() + File.separator;
-        carpetaRelativa += p.getPropiedad_id() + "/";
-
-        // Devuelve la ruta absoluta
-        File directorio = new File(rutaAbsoluta);
-        // Crea el directorio si no existe
-        if (!directorio.exists()) {
-            directorio.mkdirs();
-        }
-
-        List<Foto> listaFotos = new ArrayList<>();
-
-        Foto fotoNueva;
-
-        for (Part part : fotosForm) {
-            String fileName = part.getSubmittedFileName();
-
-            if (fileName != null && !fileName.trim().isEmpty()) {
-
-                fileName = new File(fileName).getName();
-
-                try (InputStream input = part.getInputStream()) {
-                    File archivoDestino = new File(directorio, fileName);
-                    Files.copy(input, archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (Exception e) {
-                    e.printStackTrace(); // Para ver si falla aquí en el log del servidor
-                }
-
-                fotoNueva = new Foto(carpetaRelativa + fileName, p);
-
-                listaFotos.add(fotoNueva);
-                if (part.getName().equals("portada")) {
-                    url_perfil = fotoNueva.getUrl();
-                    p.setPortada(url_perfil);
-                }
-            }
-        }
-
-        if (!listaFotos.isEmpty()) {
-            for (Foto foto : listaFotos) {
-                em.persist(foto);
-            }
-        }
-
-        return url_perfil;
-    }
-
-    public Propiedad getById(Long id) {
-        TypedQuery<Propiedad> query = em.createNamedQuery("Propiedad.getById", Propiedad.class);
-        query.setParameter("propiedad_id", id);
-
-        return query.getSingleResult();
-    }
-
-    public List<Foto> findByPropiedad(EntityManager em, Propiedad p) {
-        TypedQuery<Foto> query = em.createNamedQuery("Foto.findByPropiedad", Foto.class);
-        query.setParameter("propiedad", p);
-
-        return query.getResultList();
-
-    }
-
-    public List<Propiedad> findByPropietario(Usuario u) {
-        TypedQuery<Propiedad> q = em.createNamedQuery("Propiedad.findByPropietario", Propiedad.class);
-        q.setParameter("propietario", u);
-        return q.getResultList();
-    }
-
-    private void procesarCreacion(HttpServletRequest request) throws Exception {
+    private void listarPublicas(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
-            utx.begin();
-
-            Propiedad p = nuevaPropiedad(request);
-
-            em.persist(p);
-            em.flush();
-
-            guardarFotos(p, request.getParts());
-            verificarYActualizarRol(p.getPropietario(), request);
-
-            utx.commit();
+            List<Propiedad> todas = em.createNamedQuery("Propiedad.findAll", Propiedad.class).getResultList();
+            request.setAttribute("propiedades", todas);
+            forwardToView(request, response, "/WEB-INF/views/propiedad/propiedades.jsp");
         } catch (Exception e) {
-            try {
-                utx.rollback();
-            } catch (Exception ex) {
-                Log.log(Level.SEVERE, "Rollback failed", ex);
-            }
-            throw e;
+            manejarError(request, response, "Error cargando propiedades.");
         }
     }
 
-    private void procesarEdicion(HttpServletRequest request, Long id) throws Exception {
+    private void listarAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (!esAdmin(request)) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
+        }
         try {
+            List<Propiedad> todas = em.createNamedQuery("Propiedad.findAll", Propiedad.class).getResultList();
+            request.setAttribute("propiedades", todas);
+            forwardToView(request, response, "/WEB-INF/views/propiedad/listaPropiedades.jsp");
+        } catch (Exception e) {
+            manejarError(request, response, "Error al listar propiedades para admin.");
+        }
+    }
+
+    private void listarMisPropiedades(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Usuario u = getUsuarioSesion(request);
+        if (u == null) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
+        }
+
+        try {
+            TypedQuery<Propiedad> q = em.createNamedQuery("Propiedad.findByPropietario", Propiedad.class);
+            q.setParameter("propietario", u);
+            request.setAttribute("propiedades", q.getResultList());
+            forwardToView(request, response, "/WEB-INF/views/propiedad/misPropiedades.jsp");
+        } catch (Exception e) {
+            manejarError(request, response, "Error al cargar tus propiedades.");
+        }
+    }
+
+    private void mostrarFormularioNuevo(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (getUsuarioSesion(request) == null) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
+        }
+        forwardToView(request, response, "/WEB-INF/views/propiedad/propiedadForm.jsp");
+    }
+
+    private void mostrarDetalle(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            long id = Long.parseLong(request.getParameter("id"));
+            Propiedad p = em.find(Propiedad.class, id);
+
+            if (p != null) {
+                // Cargar imágenes
+                TypedQuery<Foto> q = em.createNamedQuery("Foto.findByPropiedad", Foto.class);
+                q.setParameter("propiedad", p);
+
+                request.setAttribute("p", p);
+                request.setAttribute("imagenes", q.getResultList());
+                forwardToView(request, response, "/WEB-INF/views/propiedad/detalle.jsp");
+            } else {
+                manejarError(request, response, "La propiedad solicitada no existe.");
+            }
+        } catch (Exception e) {
+            manejarError(request, response, "Error al mostrar detalle.");
+        }
+    }
+
+    private void mostrarFormularioEditar(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Usuario u = getUsuarioSesion(request);
+        if (u == null) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
+        }
+
+        try {
+            long id = Long.parseLong(request.getParameter("id"));
+            Propiedad p = em.find(Propiedad.class, id);
+
+            // Verificar permisos (dueño o admin)
+            if (p != null && (esDueño(p, u) || "ADMIN".equals(u.getRol()))) {
+                request.setAttribute("p", p);
+                forwardToView(request, response, "/WEB-INF/views/propiedad/propiedadForm.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/propiedades");
+            }
+        } catch (Exception e) {
+            response.sendRedirect(request.getContextPath() + "/propiedades");
+        }
+    }
+
+    private void eliminarPropiedad(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        Usuario u = getUsuarioSesion(request);
+        if (u == null) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
+        }
+
+        try {
+            long id = Long.parseLong(request.getParameter("id"));
             utx.begin();
 
             Propiedad p = em.find(Propiedad.class, id);
-            if (p == null) {
-                throw new Exception("La propiedad a editar no existe.");
+            if (p != null && (esDueño(p, u) || "ADMIN".equals(u.getRol()))) {
+                em.remove(p);
+                utx.commit();
+            } else {
+                utx.rollback();
             }
-
-            p.setNombre(request.getParameter("nombre"));
-            p.setDescripcion(request.getParameter("descripcion"));
-            p.setCalle_numero(request.getParameter("calle_numero"));
-            p.setCiudad(request.getParameter("ciudad"));
-            p.setCodigo_postal(request.getParameter("codigo_postal"));
-            p.setPrecio_habitacion(Double.parseDouble(request.getParameter("precio_habitacion")));
-            p.setHabitaciones(Integer.parseInt(request.getParameter("habitaciones")));
-            p.setBaños(Integer.parseInt(request.getParameter("banos")));
-            p.setLatitud(Double.parseDouble(request.getParameter("latitud")));
-            p.setLongitud(Double.parseDouble(request.getParameter("longitud")));
-
-            em.merge(p);
-            guardarFotos(p, request.getParts());
-
-            utx.commit();
         } catch (Exception e) {
             try {
                 utx.rollback();
             } catch (Exception ex) {
-                Log.log(Level.SEVERE, "Rollback failed", ex);
             }
-            throw e;
+            Log.log(Level.SEVERE, "Error al eliminar propiedad", e);
+        }
+
+        response.sendRedirect(request.getContextPath() + "/propiedad/mis-propiedades");
+    }
+
+
+    private void guardarPropiedad(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Usuario u = getUsuarioSesion(request);
+        if (u == null) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
+        }
+
+        String idStr = request.getParameter("id");
+        boolean esEdicion = (idStr != null && !idStr.isEmpty());
+
+        try {
+            utx.begin();
+            Propiedad p;
+
+            if (esEdicion) {
+                // EDICIÓN
+                p = em.find(Propiedad.class, Long.parseLong(idStr));
+                if (p == null || (!esDueño(p, u) && !"ADMIN".equals(u.getRol()))) {
+                    throw new Exception("No tienes permiso para editar esta propiedad.");
+                }
+            } else {
+                // CREACIÓN
+                p = new Propiedad();
+                p.setPropietario(u);
+            }
+
+            // Actualizar campos comunes
+            actualizarCamposPropiedad(p, request);
+
+            if (esEdicion) {
+                em.merge(p);
+            } else {
+                em.persist(p);
+                em.flush(); // Necesario para obtener ID y crear carpetas
+
+                // Actualizar rol a PROP si es la primera vez
+                if ("USER".equals(u.getRol())) {
+                    u.setRol("PROP");
+                    em.merge(u);
+                    request.getSession().setAttribute("user", u);
+                }
+            }
+
+            // Guardar Fotos (común para ambos)
+            guardarFotos(p, request.getParts());
+
+            utx.commit();
+            response.sendRedirect(request.getContextPath() + "/propiedad/mis-propiedades");
+
+        } catch (Exception e) {
+            try {
+                utx.rollback();
+            } catch (Exception ex) {
+            }
+            Log.log(Level.SEVERE, "Error guardando propiedad", e);
+            manejarError(request, response, "Error al guardar la propiedad: " + e.getMessage());
         }
     }
 
-    private void verificarYActualizarRol(Usuario propietario, HttpServletRequest request) {
-        if ("USER".equals(propietario.getRol())) {
-            propietario.setRol("PROP");
-            em.merge(propietario);
-            request.getSession().setAttribute("user", propietario);
+    private void actualizarCamposPropiedad(Propiedad p, HttpServletRequest request) {
+        p.setNombre(request.getParameter("nombre"));
+        p.setDescripcion(request.getParameter("descripcion"));
+        p.setCalle_numero(request.getParameter("calle_numero"));
+        p.setCiudad(request.getParameter("ciudad"));
+        p.setCodigo_postal(request.getParameter("codigo_postal"));
+        p.setPrecio_habitacion(Double.parseDouble(request.getParameter("precio_habitacion")));
+        p.setHabitaciones(Integer.parseInt(request.getParameter("habitaciones")));
+        p.setBaños(Integer.parseInt(request.getParameter("banos")));
+        p.setLatitud(Double.parseDouble(request.getParameter("latitud")));
+        p.setLongitud(Double.parseDouble(request.getParameter("longitud")));
+    }
+
+    private void guardarFotos(Propiedad p, Collection<Part> partes) {
+        String carpetaRelativa = "static/img/propiedades/" + p.getPropiedad_id() + "/";
+        String rutaAbsoluta = getServletContext().getRealPath(carpetaRelativa);
+
+        File directorio = new File(rutaAbsoluta);
+        if (!directorio.exists())
+            directorio.mkdirs();
+
+        for (Part part : partes) {
+            String fileName = part.getSubmittedFileName();
+            if (fileName != null && !fileName.trim().isEmpty()) {
+                try (InputStream input = part.getInputStream()) {
+
+                    fileName = new File(fileName).getName();
+                    File archivoDestino = new File(directorio, fileName);
+                    Files.copy(input, archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                    Foto foto = new Foto(carpetaRelativa + fileName, p);
+                    em.persist(foto);
+
+                    if ("portada".equals(part.getName())) {
+                        p.setPortada(foto.getUrl());
+                        em.merge(p);
+                    }
+                } catch (Exception e) {
+                    Log.log(Level.WARNING, "Error subiendo foto " + fileName, e);
+                }
+            }
         }
+    }
+
+    private void forwardToView(HttpServletRequest request, HttpServletResponse response, String viewPath)
+            throws ServletException, IOException {
+        request.setAttribute("view", viewPath);
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
+        rd.forward(request, response);
+    }
+
+    private void manejarError(HttpServletRequest request, HttpServletResponse response, String msg)
+            throws ServletException, IOException {
+        request.setAttribute("msg", msg);
+        forwardToView(request, response, "/WEB-INF/views/error.jsp");
+    }
+
+    private Usuario getUsuarioSesion(HttpServletRequest request) {
+        return (Usuario) request.getSession().getAttribute("user");
     }
 
     private boolean esAdmin(HttpServletRequest request) {
-        Usuario u = (Usuario) request.getSession().getAttribute("user");
+        Usuario u = getUsuarioSesion(request);
         return u != null && "ADMIN".equals(u.getRol());
+    }
+
+    private boolean esDueño(Propiedad p, Usuario u) {
+        return p.getPropietario().getUsuario_id() == u.getUsuario_id();
+    }
+
+    private void buscarPropiedadesJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String query = request.getParameter("q");
+        List<Propiedad> propiedades;
+
+        try {
+            if (query == null || query.trim().isEmpty()) {
+                propiedades = em.createNamedQuery("Propiedad.findAll", Propiedad.class).getResultList();
+            } else {
+                String jpql = "SELECT p FROM Propiedad p WHERE LOWER(p.nombre) LIKE :q OR LOWER(p.ciudad) LIKE :q";
+                propiedades = em.createQuery(jpql, Propiedad.class)
+                        .setParameter("q", "%" + query.toLowerCase() + "%")
+                        .getResultList();
+            }
+
+            // Construcción manual del JSON
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < propiedades.size(); i++) {
+                Propiedad p = propiedades.get(i);
+
+                String fotoUrl = p.getPortada(); 
+
+                json.append("{")
+                        .append("\"id\":").append(p.getPropiedad_id()).append(",")
+                        .append("\"nombre\":\"").append(p.getNombre().replace("\"", "\\\"")).append("\",")
+                        .append("\"ciudad\":\"").append(p.getCiudad().replace("\"", "\\\"")).append("\",")
+                        .append("\"precio\":").append(p.getPrecio_habitacion()).append(",")
+                        .append("\"foto\":\"").append(fotoUrl).append("\"")
+                        .append("}");
+
+                if (i < propiedades.size() - 1) {
+                    json.append(",");
+                }
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("[]"); // En caso de error devolvemos array vacío
+        }
     }
 }

@@ -27,244 +27,206 @@ public class UsuarioController extends HttpServlet {
 
     @PersistenceContext(unitName = "WebAppPU")
     private EntityManager em;
+
     @Resource
     private UserTransaction utx;
 
     private static final Logger Log = Logger.getLogger(UsuarioController.class.getName());
 
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String vista = "/WEB-INF/views/usuario/";
-        String accion = null;
-        if (request.getServletPath().equals("/usuario")) {
-            if (request.getPathInfo() != null) {
-                accion = request.getPathInfo();
-            } else {
-                accion = "error";
-            }
-        }
+
+        String accion = request.getPathInfo();
+        if (accion == null)
+            accion = "/error";
+
         switch (accion) {
-            // Dentro del switch(accion)
             case "/admin/usuarios":
-                if (!esAdmin(request)) {
-                    response.sendRedirect(request.getContextPath() + "/usuario/entrar");
-                    return;
-                }
-
-                List<Usuario> listaUsuarios = em.createNamedQuery("Usuario.findAll", Usuario.class).getResultList();
-
-                request.setAttribute("usuarios", listaUsuarios);
-                vista += "listaUsuarios.jsp"; // Crearemos esta carpeta y vista
+                listarUsuariosAdmin(request, response);
                 break;
-
-            case "/admin/editar":
-                if (!esAdmin(request)) {
-                    response.sendRedirect(request.getContextPath() + "/usuario/entrar");
-                    return;
-                }
-                
-                try {
-                    long id = Long.parseLong(request.getParameter("id"));
-                    Usuario uEdit = em.find(Usuario.class, id);
-                    if (uEdit != null) {
-                        request.setAttribute("u", uEdit);
-                        vista = "admin/usuarioFormAdmin.jsp"; // Crearemos esta vista nueva
-                    } else {
-                        response.sendRedirect(request.getContextPath() + "/usuario/admin/usuarios");
-                        return;
-                    }
-                } catch (Exception e) {
-                    response.sendRedirect(request.getContextPath() + "/usuario/admin/usuarios");
-                    return;
-                }
-                break;
-
             case "/admin/eliminar":
-                if (!esAdmin(request))
-                    return;
-
-                // Lógica para borrar usuario
-                try {
-                    long id = Long.parseLong(request.getParameter("id"));
-                    utx.begin();
-                    Usuario u = em.find(Usuario.class, id);
-                    if (u != null)
-                        em.remove(u);
-                    utx.commit();
-                } catch (Exception e) {
-                    // rollback...
-                }
-                response.sendRedirect(request.getContextPath() + "/usuario/admin/usuarios");
-                return;
-            case "/nuevo": {
-                vista += "usuarioForm.jsp";
+                eliminarUsuario(request, response);
                 break;
-            }
-            case "/entrar": {
-                vista += "usuarioLogin.jsp";
+            case "/nuevo":
+                forwardToView(request, response, "/WEB-INF/views/usuario/usuarioForm.jsp");
                 break;
-            }
-            case "/salir": {
-                logout(request);
-                response.sendRedirect(request.getContextPath() + "/propiedades");
-                return;
-            }
-            default: {
-                vista += "error.jsp";
-            }
+            case "/entrar":
+                forwardToView(request, response, "/WEB-INF/views/usuario/usuarioLogin.jsp");
+                break;
+            case "/salir":
+                cerrarSesion(request, response);
+                break;
+            default:
+                forwardToView(request, response, "/WEB-INF/views/error.jsp");
+                break;
         }
-        request.setAttribute("view", vista);
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
-        rd.forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String accion = request.getPathInfo();
-        if (accion.equals("/guardar")) {
-            try {
-                nuevoUsuario(request);
-                response.sendRedirect("http://localhost:8080/WebApp/");
-            } catch (Exception e) {
-                request.setAttribute("msg", "Error: datos no válidos");
-                request.setAttribute("view", "/WEB-INF/views/error.jsp");
-                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
-                rd.forward(request, response);
-            }
-        } else if (accion.equals("/validar")) {
-            Usuario u = null;
-            try {
-                u = loginUser(request);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (crearSesionUsuario(request, u)) {
-                response.sendRedirect(request.getContextPath() + "/propiedades");
-            } else {
-                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
-                rd.forward(request, response);
-            }
-        } else {
-            RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/error.jsp");
-            rd.forward(request, response);
+        if (accion == null)
+            accion = "";
+
+        switch (accion) {
+            case "/guardar":
+                procesarRegistro(request, response);
+                break;
+            case "/validar":
+                procesarLogin(request, response);
+                break;
+            default:
+                forwardToView(request, response, "/WEB-INF/views/error.jsp");
+                break;
         }
     }
 
-    private Usuario loginUser(HttpServletRequest request) throws Exception {
 
-        Usuario user = null;
-
-        String email = request.getParameter("email");
-        String pwd = request.getParameter("contra");
-        if (email.isEmpty() || pwd.isEmpty()) {
-            throw new Exception("Datos no válidos");
+    private void listarUsuariosAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (!esAdmin(request)) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
         }
 
         try {
-            user = findByCredentials(email, encriptPassword(pwd));
+            List<Usuario> listaUsuarios = em.createNamedQuery("Usuario.findAll", Usuario.class).getResultList();
+            request.setAttribute("usuarios", listaUsuarios);
+            forwardToView(request, response, "/WEB-INF/views/usuario/listaUsuarios.jsp");
         } catch (Exception e) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, "exception caught", e);
-            throw new RuntimeException(e);
-        }
-
-        if (user == null) {
-            throw new Exception("Usuario no encontrado");
-        } else {
-            return user;
+            manejarError(request, response, "Error al listar usuarios: " + e.getMessage());
         }
     }
 
-    private Usuario nuevoUsuario(HttpServletRequest request) {
-        String name = request.getParameter("nombre");
-        String apellido = request.getParameter("apellidos");
+    private void eliminarUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        if (!esAdmin(request)) {
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+            return;
+        }
+
+        try {
+            long id = Long.parseLong(request.getParameter("id"));
+            utx.begin();
+            Usuario u = em.find(Usuario.class, id);
+            if (u != null) {
+                em.remove(u);
+            }
+            utx.commit();
+        } catch (Exception e) {
+            Log.log(Level.SEVERE, "Error eliminando usuario", e);
+            try {
+                utx.rollback();
+            } catch (Exception ex) {
+            }
+        }
+
+        response.sendRedirect(request.getContextPath() + "/usuario/admin/usuarios");
+    }
+
+    private void cerrarSesion(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        request.getSession().invalidate();
+        response.sendRedirect(request.getContextPath() + "/propiedades");
+    }
+
+    private void procesarRegistro(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            utx.begin();
+
+            String nombre = request.getParameter("nombre");
+            String apellidos = request.getParameter("apellidos");
+            String email = request.getParameter("email");
+            String contra = request.getParameter("contra");
+            String rol = request.getParameter("rol"); // Por si un admin crea usuarios
+
+            Usuario u = new Usuario(nombre, apellidos, email, encriptPassword(contra));
+
+            if (rol != null && !rol.isEmpty() && esAdmin(request)) {
+                u.setRol(rol);
+            }
+
+            em.persist(u);
+            utx.commit();
+
+            response.sendRedirect(request.getContextPath() + "/usuario/entrar");
+
+        } catch (Exception e) {
+            Log.log(Level.SEVERE, "Error en registro", e);
+            try {
+                utx.rollback();
+            } catch (Exception ex) {
+            }
+            manejarError(request, response, "Error al registrar usuario. Verifique los datos.");
+        }
+    }
+
+    private void procesarLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String email = request.getParameter("email");
         String contra = request.getParameter("contra");
 
-        String pass_digest = encriptPassword(contra);
-
-        Usuario u = new Usuario(name, apellido, email, pass_digest);
         try {
-            utx.begin();
-            em.persist(u);
-            Log.log(Level.INFO, "New User saved");
-            utx.commit();
-            return u;
+            TypedQuery<Usuario> q = em.createNamedQuery("Usuario.findByCredentials", Usuario.class);
+            q.setParameter("email", email);
+            q.setParameter("pwd", encriptPassword(contra));
+
+            List<Usuario> resultados = q.getResultList();
+
+            if (!resultados.isEmpty()) {
+                Usuario u = resultados.get(0);
+                HttpSession session = request.getSession();
+                session.setAttribute("user", u);
+                session.setAttribute("rol", u.getRol());
+                response.sendRedirect(request.getContextPath() + "/propiedades");
+            } else {
+                request.setAttribute("msg", "Usuario o contraseña incorrectos");
+                request.setAttribute("style", "error"); 
+                forwardToView(request, response, "/WEB-INF/views/usuario/usuarioLogin.jsp");
+            }
+
         } catch (Exception e) {
-            Log.log(Level.SEVERE, "exception caught", e);
-            throw new RuntimeException(e);
+            Log.log(Level.SEVERE, "Error en login", e);
+            manejarError(request, response, "Error interno en el servidor.");
         }
     }
 
-    private Usuario findByCredentials(String email, String pwd) {
-        Usuario user = null;
-        try {
-            List<Usuario> users;
-            TypedQuery<Usuario> q1 = em.createNamedQuery("Usuario.findByCredentials", Usuario.class);
-            q1.setParameter("email", email);
-            q1.setParameter("pwd", pwd);
-            users = q1.getResultList();
+    private void forwardToView(HttpServletRequest request, HttpServletResponse response, String viewPath)
+            throws ServletException, IOException {
+        request.setAttribute("view", viewPath); 
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/template.jsp");
+        rd.forward(request, response);
+    }
 
-            if (!users.isEmpty()) {
-                user = users.get(0);
-            }
-        } catch (Exception e) {
-            Log.log(Level.WARNING, "EXCEPTION: ", e);
-        }
+    private void manejarError(HttpServletRequest request, HttpServletResponse response, String msg)
+            throws ServletException, IOException {
+        request.setAttribute("msg", msg);
+        forwardToView(request, response, "/WEB-INF/views/error.jsp");
+    }
 
-        return user;
+    private boolean esAdmin(HttpServletRequest request) {
+        Usuario u = (Usuario) request.getSession().getAttribute("user");
+        return u != null && "ADMIN".equals(u.getRol());
     }
 
     private String encriptPassword(String pwd) {
-
-        String pass_digest = null;
-
-        MessageDigest md;
         try {
-            md = MessageDigest.getInstance("MD5");
+            MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(pwd.getBytes());
             byte[] digest = md.digest();
             StringBuilder sb = new StringBuilder();
             for (byte b : digest) {
                 sb.append(String.format("%02x", b & 0xff));
             }
-            pass_digest = sb.toString();
+            return sb.toString();
         } catch (NoSuchAlgorithmException ex) {
-            Log.log(Level.SEVERE, "EXCEPTION: ", ex);
+            Log.log(Level.SEVERE, "Error de encriptación", ex);
+            return null;
         }
-
-        return pass_digest;
-
-    }
-
-    private void logout(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        session.invalidate();
-    }
-
-    private boolean crearSesionUsuario(HttpServletRequest request, Usuario u) {
-        HttpSession session = request.getSession();
-        String msg;
-        String style;
-        if (u != null) {
-            session.setAttribute("user", u);
-            session.setAttribute("rol", u.getRol());
-            return true;
-        } else {
-            msg = "ERROR: Login incorrecto";
-            style = "danger";
-            session.removeAttribute("user");
-            session.removeAttribute("role");
-            request.setAttribute("msg", msg);
-            request.setAttribute("style", style);
-            request.setAttribute("view", "/WEB-INF/views/usuario/usuarioLogin.jsp");
-            return false;
-        }
-    }
-
-    private boolean esAdmin(HttpServletRequest request) {
-        Usuario u = (Usuario) request.getSession().getAttribute("user");
-        return u != null && "ADMIN".equals(u.getRol());
     }
 }

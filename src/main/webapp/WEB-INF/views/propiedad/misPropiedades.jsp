@@ -25,7 +25,7 @@
 
                                     <div style="display: flex; gap: 5px; justify-content: space-between;">
                                         <a href="${pageContext.request.contextPath}/propiedad/detalle?id=${p.propiedad_id}"
-                                            class="btn-detalle"
+                                            class="button"
                                             style="flex: 1; text-align: center; font-size: 0.9rem;">Ver</a>
 
                                         <a href="${pageContext.request.contextPath}/propiedad/editar?id=${p.propiedad_id}"

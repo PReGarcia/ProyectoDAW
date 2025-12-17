@@ -2,8 +2,12 @@
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <div class="container">
             <h1>Nuestras Propiedades</h1>
+            <div class="search-container" style="margin-bottom: 20px;">
+                <input type="text" id="buscadorPropiedades" class="form-control"
+                    placeholder="Buscar por nombre o ciudad..." autocomplete="off">
+            </div>
 
-            <div class="propiedades-grid">
+            <div id="listaPropiedades" class="propiedades-grid">
 
                 <c:if test="${!empty requestScope.propiedades}">
 
@@ -24,7 +28,7 @@
                                 </p>
 
                                 <div class="propiedad-footer">
-                                    <span class="propiedad-precio">${p.precio_habitacion} $ / noche</span>
+                                    <span class="propiedad-precio">${p.precio_habitacion} € / noche</span>
                                     <a href="${pageContext.request.contextPath}/propiedad/detalle?id=${p.propiedad_id}"
                                         class="button">Ver más</a>
                                 </div>
@@ -40,3 +44,4 @@
 
             </div>
         </div>
+        <script src="${pageContext.request.contextPath}/static/js/buscador.js"></script>

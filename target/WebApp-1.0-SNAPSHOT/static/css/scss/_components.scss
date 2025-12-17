@@ -168,6 +168,11 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+
+    @media (max-width: 835px) {
+        padding: 0; 
+        width: 100%;
+    }
 }
 
 .propiedad-card.detalle-card {
@@ -235,6 +240,15 @@
     align-items: center;
     flex-wrap: wrap; 
     gap: 10px;
+
+    .propiedad-footer-buttons {
+        display: flex;
+        gap: 10px;
+        flex-direction: row-reverse;
+        .button{
+            margin-bottom: 10px;
+        }
+    }
 }
 
 /* --- TABLAS DE DATOS --- */
@@ -393,3 +407,4 @@
     border: 1px solid $border-color; /* Opcional: marca el límite del scroll */
     border-radius: $border-radius;
 }
+

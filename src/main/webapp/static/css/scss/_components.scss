@@ -24,7 +24,7 @@
     border-radius: $border-radius;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 500px; // Evita que se estiren demasiado
+    max-width: 500px; 
     margin: 0 auto;
 
     label {
@@ -106,22 +106,21 @@
 /* --- CARRUSEL DE DETALLE.JSP --- */
 .carousel {
    position: relative;
-    width: 100%;           /* O un ancho fijo, ej: 800px */
-    max-width: 800px;      /* Ancho máximo para que no se estire demasiado */
-    height: 450px;         /* ESTABLECE AQUÍ LA ALTURA FIJA DESEADA */
+    width: 100%;           
+    max-width: 800px;      
+    height: 450px;         
     margin: 0 auto 20px auto;
-    overflow: hidden;      /* Esencial para recortar */
+    overflow: hidden;      
     border-radius: 5px;
-    background-color: #ddd;/* Fondo gris mientras carga */
+    background-color: #ddd;
 }
 
 .carousel-item {
-    display: none; /* Ocultos por defecto */
+    display: none;
     width: 100%;
     height: 100%;
 }
 
-/* La clase .active se añade con JS */
 .carousel-item.active {
     display: block;
     animation: fade 0.5s;
@@ -130,8 +129,8 @@
 .carousel-img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Ajusta la imagen dentro sin recortar */
-    background-color: #333; /* Color de fondo para los espacios vacíos */
+    object-fit: contain; 
+    background-color: #333; 
 }
 
 /* Botones de navegación */
@@ -168,6 +167,11 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+
+    @media (max-width: 835px) {
+        padding: 0; 
+        width: 100%;
+    }
 }
 
 .propiedad-card.detalle-card {
@@ -190,7 +194,7 @@
     align-items: center;
     justify-content: center;
     color: #7f8c8d;
-    background-color: #ddd; /* Asegura el fondo gris */
+    background-color: #ddd; 
 }
 
 .propiedad-features {
@@ -200,7 +204,7 @@
     background: #f4f7f6;
     padding: 15px;
     border-radius: $border-radius;
-    flex-wrap: wrap; /* Para móviles */
+    flex-wrap: wrap; 
 }
 
 .propiedad-descripcion {
@@ -228,13 +232,22 @@
 }
 
 .detalle-footer {
-    border-top: 1px solid #eee; /* O usa $light-bg si está definido */
+    border-top: 1px solid #eee; 
     padding-top: 20px; 
     display: flex; 
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap; 
     gap: 10px;
+
+    .propiedad-footer-buttons {
+        display: flex;
+        gap: 10px;
+        flex-direction: row-reverse;
+        .button{
+            margin-bottom: 10px;
+        }
+    }
 }
 
 /* --- TABLAS DE DATOS --- */
@@ -244,7 +257,7 @@
     margin-top: 20px;
 
     th, td {
-        border: 1px solid $border-color; // Asegúrate que $border-color existe en _variables, si no usa #ddd
+        border: 1px solid $border-color; 
         padding: 10px;
         text-align: left;
     }
@@ -260,7 +273,7 @@
     border-radius: 4px;
     font-size: 0.9em;
     color: $white;
-    display: inline-block; /* Mejor comportamiento */
+    display: inline-block; 
 
     &.badge-success { 
         background-color: #28a745; 
@@ -285,7 +298,6 @@
         border-color: #bee5eb;
     }
     
-    // Podemos añadir la de error aquí para usarla luego en el login
     &.alert-error {
         color: $white;
         background-color: #e74c3c;
@@ -308,16 +320,15 @@
 
 /* --- BADGES DE ROLES --- */
 .badge-admin {
-    background-color: #e74c3c; /* Rojo para admin */
+    background-color: #e74c3c; 
     color: $white;
 }
 
 .badge-prop {
-    background-color: #27ae60; /* Verde para propietario */
+    background-color: #27ae60; 
     color: $white;
 }
 
-// Aseguramos que la alerta de error tenga estilo si no lo tenía
 .alert-error {
     background-color: #e74c3c;
     color: $white;
@@ -335,7 +346,7 @@
 
 .reserva-price {
     text-align: center;
-    color: #3498db; /* Azul */
+    color: #3498db; 
     font-weight: bold;
     margin-bottom: 20px;
 }
@@ -348,7 +359,7 @@
 
 /* Botones adicionales */
 .button-success {
-    background-color: #2ecc71; /* Verde */
+    background-color: #2ecc71; 
     color: $white;
     border: none;
     
@@ -358,16 +369,15 @@
 }
 
 .button-secondary {
-    background-color: #95a5a6; /* Gris */
+    background-color: #95a5a6; 
     color: $white;
-    text-decoration: none; /* Asegura que no parezca un enlace subrayado */
+    text-decoration: none; 
     
     &:hover {
         background-color: darken(#95a5a6, 10%);
     }
 }
 
-/* Utilidad simple */
 .text-center {
     text-align: center;
 }
@@ -384,12 +394,12 @@
     width: 100%;
 }
 
-/* Contenedor para hacer la tabla responsive (scroll horizontal en móviles) */
 .table-responsive {
     width: 100%;
-    overflow-x: auto; /* Permite scroll lateral si no cabe */
-    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
     margin-bottom: $spacing-md;
-    border: 1px solid $border-color; /* Opcional: marca el límite del scroll */
+    border: 1px solid $border-color;
     border-radius: $border-radius;
 }
+

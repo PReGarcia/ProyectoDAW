@@ -50,11 +50,8 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="#" onclick="alert('Confirmar reserva ID: ${reserva.reserva_id}')" 
-                                   class="button button-sm button-success">Confirmar</a>
-                                   
-                                <a href="#" onclick="alert('Cancelar reserva ID: ${reserva.reserva_id}')" 
-                                   class="button button-sm button-danger">Cancelar</a>
+                                <a href="${pageContext.request.getContextPath()}/reserva/cancelar?id=${reserva.reserva_id}" onclick="return confirm('¿Estás seguro de que deseas cancelar esta reserva?');" 
+                                   class="button button-sm button-danger">Eliminar</a>
                             </td>
                         </tr>
                     </c:forEach>

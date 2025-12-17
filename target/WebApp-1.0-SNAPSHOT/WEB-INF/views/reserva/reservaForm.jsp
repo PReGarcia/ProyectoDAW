@@ -3,8 +3,7 @@
 
         <div class="container reserva-container">
             <h1 class="text-center">Reservar Propiedad: ${p.getNombre()}</h1>
-            <p class="reserva-price">Precio por noche: 💲 ${p.getPrecio_habitacion()}
-                ${p.getPrecio_habitacion()}</p>
+            <p class="reserva-price">Precio por noche: 💲 ${p.getPrecio_habitacion()}</p>
 
             <c:if test="${not empty requestScope.error}">
                 <div class="alert alert-error">
@@ -21,7 +20,6 @@
                         placeholder="Fecha de Entrada y Salida" required
                         data-api-url="${pageContext.request.contextPath}/reserva/api/fechas-reservadas">
 
-                    <script src="${pageContext.request.contextPath}/static/js/reserva-form.js"></script>
 
 
                     <input type="hidden" id="fechaInicio" name="fechaInicio">
@@ -40,3 +38,4 @@
             </form>
 
         </div>
+        <script src="${pageContext.request.contextPath}/static/js/reservaForm.js"></script>

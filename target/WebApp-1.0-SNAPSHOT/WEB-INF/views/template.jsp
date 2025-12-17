@@ -35,10 +35,8 @@
                             <c:when test="${not empty sessionScope.user}">
                                 <a href="${pageContext.request.contextPath}/propiedad/nuevo">Registrar Propiedad</a>
 
-                                <c:if test="${sessionScope.user.getRol() == 'PROP'}">
                                     <a href="${pageContext.request.contextPath}/propiedad/mis-propiedades">Mis
                                         Propiedades</a>
-                                </c:if>
                                     <a class="nav-link"
                                         href="${pageContext.request.contextPath}/reserva/mis-reservas">Mis Reservas</a>
                                     <a href="${pageContext.request.contextPath}/usuario/salir" class="nav-link-salir">(Salir)</a>

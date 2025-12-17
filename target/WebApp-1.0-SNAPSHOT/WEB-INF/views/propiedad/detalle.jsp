@@ -62,17 +62,17 @@
                                     ${p.propietario.apellidos}</strong></small>
                         </div>
 
-                        <div>
-                            <a href="${pageContext.request.contextPath}/propiedades"
-                                class="button btn-secondary">Volver</a>
-                            <c:if test="${not empty sessionScope.user}">
-                                <a href="${pageContext.request.contextPath}/reserva/nueva?propiedadId=${p.getPropiedad_id()}"
-                                    class="button">Reservar Ahora</a>
-                            </c:if>
+                        <div class="propiedad-footer-buttons">
                             <c:if test="${empty sessionScope.user}">
                                 <a href="${pageContext.request.contextPath}/usuario/entrar" class="button">Inicia sesión
                                     para reservar</a>
                             </c:if>
+                            <c:if test="${not empty sessionScope.user}">
+                                <a href="${pageContext.request.contextPath}/reserva/nueva?propiedadId=${p.getPropiedad_id()}"
+                                    class="button">Reservar Ahora</a>
+                            </c:if>
+                            <a href="${pageContext.request.contextPath}/propiedades"
+                                class="button btn-secondary">Volver</a>
                         </div>
                     </div>
                 </div>
